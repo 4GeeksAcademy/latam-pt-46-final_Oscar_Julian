@@ -1,11 +1,34 @@
-export const Footer = () => (
-	<footer className="footer mt-auto py-3 text-center">
-		<p>
-			Check the <a target="_blank" href="https://4geeks.com/docs/start/react-flask-template">template documentation</a> <i className="fa-solid fa-file"></i> for help.
-		</p>
-		<p>
-			Made with <i className="fa fa-heart text-danger" /> by{" "}
-			<a href="http://www.4geeksacademy.com">4Geeks Academy</a>
-		</p>
-	</footer>
-);
+export const Footer = () => {
+	return (
+		<footer className="bg-dark text-white py-4">
+			<div className="container">
+				<div className="row">
+					<div className="col-md-6">
+						<h5>Mi Biblioteca Personal</h5>
+						<p className="small">Tu espacio para gestionar y disfrutar de tus lecturas favoritas.</p>
+					</div>
+					<div className="col-md-3">
+						<h5>Enlaces</h5>
+						<ul className="list-unstyled">
+							<li><a href="#" className="text-white">Inicio</a></li>
+							<li><a href="#" className="text-white">Características</a></li>
+							<li><a href="#" className="text-white">Contacto</a></li>
+						</ul>
+					</div>
+					<div className="col-md-3">
+						<h5>Síguenos</h5>
+						<div className="social-icons">
+							<a href="#" className="text-white me-2"><i className="fab fa-facebook"></i></a>
+							<a href="#" className="text-white me-2"><i className="fab fa-twitter"></i></a>
+							<a href="#" className="text-white"><i className="fab fa-instagram"></i></a>
+						</div>
+					</div>
+				</div>
+				<hr className="my-3" />
+				<div className="text-center">
+					<p className="small mb-0">&copy; 2025 Mi Biblioteca Personal. Todos los derechos reservados.</p>
+				</div>
+			</div>
+		</footer>
+	);
+};

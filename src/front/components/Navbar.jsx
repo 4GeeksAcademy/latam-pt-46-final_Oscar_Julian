@@ -1,18 +1,33 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export const Navbar = () => {
-
 	return (
-		<nav className="navbar navbar-light bg-light">
-			<div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">React Boilerplate</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Check the Context in action</button>
-					</Link>
-				</div>
+		<nav className="navbar justify-content-center p-4">
+			<div className="btn-group shadow-0 w-auto" role="group" aria-label="Basic example">
+				<button type="button" className="btn btn-outline-primary home-btn">
+					<i className="fa-solid fa-house"></i>
+					<span className="ms-1 text-span">Mi Biblioteca</span>
+				</button>
+
+				<button type="button" className="btn btn-outline-primary home-btn">
+					<i class="fa-solid fa-binoculars"></i>
+					<span className="ms-1 text-span">Explorar</span>
+				</button>
+
+				<button type="button" className="btn btn-outline-primary login-btn">
+					<i className="fa-solid fa-right-to-bracket"></i>
+					<span className="ms-1 text-span">Login</span>
+				</button>
+
+				<button type="button" className="btn btn-outline-primary signup-btn">
+					<i className="fa-solid fa-user-plus"></i>
+					<span className="ms-1 text-span">Registro</span>
+				</button>
+
+				<button type="button" className="btn btn-outline-primary signup-btn">
+					<i className="fa-solid fa-user-minus"></i>
+					<span className="ms-1 text-span">Cerrar Sesion</span>
+				</button>
 			</div>
 		</nav>
 	);
