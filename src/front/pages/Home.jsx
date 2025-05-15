@@ -1,37 +1,36 @@
-import React, { useEffect } from "react";
-import useGlobalReducer from "../hooks/useGlobalReducer.jsx";
+import { useEffect } from "react";
 
 // Asegúrate de tener Font Awesome en tu index.html:
 // <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 export const Home = () => {
-  const { store, dispatch } = useGlobalReducer();
+  // const { store, dispatch } = useGlobalReducer();
 
-  const loadMessage = async () => {
-    try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  // const loadMessage = async () => {
+  //   try {
+  //     const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-      if (!backendUrl)
-        throw new Error("VITE_BACKEND_URL is not defined in .env file");
+  //     if (!backendUrl)
+  //       throw new Error("VITE_BACKEND_URL is not defined in .env file");
 
-      const response = await fetch(backendUrl + "/api/hello");
-      const data = await response.json();
+  //     const response = await fetch(backendUrl + "/api/hello");
+  //     const data = await response.json();
 
-      if (response.ok) dispatch({ type: "set_hello", payload: data.message });
+  //     if (response.ok) dispatch({ type: "set_hello", payload: data.message });
 
-      return data;
-    } catch (error) {
-      if (error.message)
-        throw new Error(
-          `Could not fetch the message from the backend.
-				Please check if the backend is running and the backend port is public.`
-        );
-    }
-  };
+  //     return data;
+  //   } catch (error) {
+  //     if (error.message)
+  //       throw new Error(
+  //         `Could not fetch the message from the backend.
+	// 			Please check if the backend is running and the backend port is public.`
+  //       );
+  //   }
+  // };
 
-  useEffect(() => {
-    loadMessage();
-  }, []);
+  // useEffect(() => {
+  //   loadMessage();
+  // }, []);
 
   return (
     <>

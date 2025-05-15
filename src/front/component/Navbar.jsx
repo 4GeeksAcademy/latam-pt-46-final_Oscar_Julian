@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export const Navbar = () => {
+	const navigate = useNavigate();
 	return (
 		<nav className="navbar justify-content-center p-4">
 			<div className="btn-group shadow-0 w-auto" role="group" aria-label="Basic example">
@@ -14,7 +16,7 @@ export const Navbar = () => {
 					<span className="ms-1 text-span">Explorar</span>
 				</button>
 
-				<button type="button" className="btn btn-outline-primary login-btn">
+				<button onClick={() => navigate("/sign")} type="button" className="btn btn-outline-primary login-btn">
 					<i className="fa-solid fa-right-to-bracket"></i>
 					<span className="ms-1 text-span">Login</span>
 				</button>
