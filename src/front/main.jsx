@@ -1,11 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import './index.css'  // Global styles for your application
-import Layout from './layout';  // Import the Layout component directly
+import App from './App';  // Import the App component directly
 import { BackendURL } from './component/BackendURL';
 
 const Main = () => {
-
     if (!import.meta.env.VITE_BACKEND_URL || import.meta.env.VITE_BACKEND_URL == "") return (
         <React.StrictMode>
             <BackendURL />
@@ -14,7 +13,7 @@ const Main = () => {
 
     return (
         <React.StrictMode>
-            <Layout />  {/* Render the Layout component which has context already injected */}
+            <App />
         </React.StrictMode>
     );
 }
