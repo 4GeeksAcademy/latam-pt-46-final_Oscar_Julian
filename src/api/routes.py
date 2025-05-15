@@ -10,15 +10,6 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
-
-@api.route('/hello', methods=['POST', 'GET'])
-def handle_hello():
-    response_body = {
-        "message": "Hello! I'm a message that came from the backend, check the network tab on the google inspector and you will see the GET request"
-    }
-    return jsonify(response_body), 200
-
-
 @api.route('/signup', methods=['POST'])
 def signup():
     try:
@@ -83,7 +74,7 @@ def login():
             return jsonify({"message": "User account is not active"}), 401
 
         # Create access token
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
 
         return jsonify({
             "message": "Logged in successfully",

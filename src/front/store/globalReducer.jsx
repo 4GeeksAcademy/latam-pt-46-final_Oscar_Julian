@@ -74,9 +74,11 @@ export const GlobalProvider = ({ children }) => {
     useEffect(() => {
         const checkToken = async () => {
             const token = sessionStorage.getItem("token");
+            console.log(token);
+            
             if (token) {
                 try {
-                    const apiUrl = `${store.apiUrl}/api/user`;
+                    const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/user`;
                     console.log("Validating token using URL:", apiUrl);
 
                     const response = await fetch(apiUrl, {
@@ -111,7 +113,7 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                const apiUrl = `${store.apiUrl}/api/signup`;
+                const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/signup`;
                 console.log("Signup request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
@@ -167,7 +169,7 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                const apiUrl = `${store.apiUrl}/api/login`;
+                const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/login`;
                 console.log("Login request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
@@ -193,9 +195,10 @@ export const GlobalProvider = ({ children }) => {
                 }
 
                 const data = await response.json();
-
+                
                 // Guardar token en sessionStorage
                 sessionStorage.setItem("token", data.token);
+                console.log(sessionStorage.getItem("token"));
 
                 // Actualizar estado
                 dispatch({ type: ACTIONS.SET_USER, payload: data.user });
@@ -228,7 +231,8 @@ export const GlobalProvider = ({ children }) => {
 
         validateToken: async () => {
             const token = sessionStorage.getItem("token");
-
+            console.log(token);
+            
             if (!token) {
                 dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: false });
                 dispatch({ type: ACTIONS.SET_USER, payload: null });
@@ -236,13 +240,13 @@ export const GlobalProvider = ({ children }) => {
             }
 
             try {
-                const apiUrl = `${store.apiUrl}/api/user`;
+                const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/user`;
                 console.log("Validating token using URL:", apiUrl);
 
                 const response = await fetch(apiUrl, {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${token}`
+                        "Authorization": `Bearer ${token}`,
                     }
                 });
 
