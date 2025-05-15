@@ -1,17 +1,48 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
-import { BackendURL } from "../component/BackendURL";
 
 export const Home = () => {
-  const handleStartClick = () => {
-    if (store.isAuthenticated) {
-      navigate("/welcome");
-    } else {
-      navigate("/signup");
+  const { store, actions } = useGlobalReducer();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  // Verificar autenticación al cargar el componente
+  useEffect(() => {
+    const checkAuth = async () => {
+      await actions.validateToken();
+      setLoading(false);
+    };
+
+    checkAuth();
+  }, []);
+
+  // Redirección si no está autenticado
+  useEffect(() => {
+    if (!loading && !store.isAuthenticated) {
+      navigate("/login");
     }
+  }, [store.isAuthenticated, loading]);
+
+  const handleStartClick = () => {
+    navigate("/welcome");
   };
 
+  // Mostrar estado de carga
+  if (loading) {
+    return (
+      <div className="container text-center mt-5">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // No renderizar nada si no está autenticado
+  if (!store.isAuthenticated) {
+    return null;
+  }
   return (
     <>
       {/* Hero Section */}
