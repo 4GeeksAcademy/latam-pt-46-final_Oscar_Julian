@@ -170,7 +170,6 @@ export const GlobalProvider = ({ children }) => {
 
             try {
                 const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/login`;
-                console.log("Login request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
@@ -198,7 +197,6 @@ export const GlobalProvider = ({ children }) => {
                 
                 // Guardar token en sessionStorage
                 sessionStorage.setItem("token", data.token);
-                console.log(sessionStorage.getItem("token"));
 
                 // Actualizar estado
                 dispatch({ type: ACTIONS.SET_USER, payload: data.user });
@@ -211,7 +209,6 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Login error:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Network error. Please check your connection and try again."
@@ -231,7 +228,6 @@ export const GlobalProvider = ({ children }) => {
 
         validateToken: async () => {
             const token = sessionStorage.getItem("token");
-            console.log(token);
             
             if (!token) {
                 dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: false });
@@ -241,7 +237,6 @@ export const GlobalProvider = ({ children }) => {
 
             try {
                 const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/user`;
-                console.log("Validating token using URL:", apiUrl);
 
                 const response = await fetch(apiUrl, {
                     method: "GET",
@@ -252,7 +247,6 @@ export const GlobalProvider = ({ children }) => {
 
                 if (!response.ok) {
                     // Token inválido
-                    console.log("Token validation failed:", response.status);
                     sessionStorage.removeItem("token");
                     dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: false });
                     dispatch({ type: ACTIONS.SET_USER, payload: null });
@@ -263,7 +257,6 @@ export const GlobalProvider = ({ children }) => {
                 dispatch({ type: ACTIONS.SET_USER, payload: userData });
                 dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: true });
             } catch (error) {
-                console.error("Token validation error:", error);
                 sessionStorage.removeItem("token");
                 dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: false });
                 dispatch({ type: ACTIONS.SET_USER, payload: null });
