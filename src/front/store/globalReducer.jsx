@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer } from 'react';
+import { createContext, useContext, useReducer, useEffect } from 'react';
 
 // Crear el contexto
 export const GlobalContext = createContext();
@@ -57,6 +57,37 @@ export const useGlobalReducer = () => {
 // Proveedor que envuelve la aplicación
 export const GlobalProvider = ({ children }) => {
     const [store, dispatch] = useReducer(reducer, initialState);
+
+    // Verificar token al cargar el proveedor
+    useEffect(() => {
+        const checkToken = async () => {
+            const token = sessionStorage.getItem("token");
+            if (token) {
+                try {
+                    const response = await fetch(`${store.apiUrl}/api/user`, {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        const userData = await response.json();
+                        dispatch({ type: ACTIONS.SET_USER, payload: userData });
+                        dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: true });
+                    } else {
+                        // Token inválido o expirado
+                        sessionStorage.removeItem("token");
+                    }
+                } catch (error) {
+                    console.error("Error validating token on load:", error);
+                    sessionStorage.removeItem("token");
+                }
+            }
+        };
+
+        checkToken();
+    }, []);
 
     // Funciones de acción que serán utilizadas en los componentes
     const actions = {

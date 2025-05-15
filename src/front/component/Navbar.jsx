@@ -1,35 +1,50 @@
-import { Link, useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useGlobalReducer } from "../store/globalReducer";
 
 export const Navbar = () => {
+	const { store, actions } = useGlobalReducer();
 	const navigate = useNavigate();
+
+	const handleLogout = () => {
+		actions.logout();
+		navigate("/login");
+	};
+
 	return (
 		<nav className="navbar justify-content-center p-4">
 			<div className="btn-group shadow-0 w-auto" role="group" aria-label="Basic example">
-				<button type="button" className="btn btn-outline-primary home-btn">
+				<Link to="/" className="btn btn-outline-primary home-btn">
 					<i className="fa-solid fa-house"></i>
 					<span className="ms-1 text-span">Mi Biblioteca</span>
-				</button>
+				</Link>
 
-				<button type="button" className="btn btn-outline-primary home-btn">
-					<i class="fa-solid fa-binoculars"></i>
+				<Link to="/" className="btn btn-outline-primary home-btn">
+					<i className="fa-solid fa-binoculars"></i>
 					<span className="ms-1 text-span">Explorar</span>
-				</button>
+				</Link>
 
-				<button onClick={() => navigate("/sign")} type="button" className="btn btn-outline-primary login-btn">
-					<i className="fa-solid fa-right-to-bracket"></i>
-					<span className="ms-1 text-span">Login</span>
-				</button>
+				{!store.isAuthenticated ? (
+					<>
+						<Link to="/login" className="btn btn-outline-primary login-btn">
+							<i className="fa-solid fa-right-to-bracket"></i>
+							<span className="ms-1 text-span">Login</span>
+						</Link>
 
-				<button type="button" className="btn btn-outline-primary signup-btn">
-					<i className="fa-solid fa-user-plus"></i>
-					<span className="ms-1 text-span">Registro</span>
-				</button>
-
-				<button type="button" className="btn btn-outline-primary signup-btn">
-					<i className="fa-solid fa-user-minus"></i>
-					<span className="ms-1 text-span">Cerrar Sesion</span>
-				</button>
+						<Link to="/signup" className="btn btn-outline-primary signup-btn">
+							<i className="fa-solid fa-user-plus"></i>
+							<span className="ms-1 text-span">Registro</span>
+						</Link>
+					</>
+				) : (
+					<button
+						type="button"
+						className="btn btn-outline-primary signup-btn"
+						onClick={handleLogout}
+					>
+						<i className="fa-solid fa-user-minus"></i>
+						<span className="ms-1 text-span">Cerrar Sesión</span>
+					</button>
+				)}
 			</div>
 		</nav>
 	);

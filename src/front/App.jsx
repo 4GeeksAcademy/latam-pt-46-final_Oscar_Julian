@@ -8,28 +8,42 @@ import { Welcome } from "./pages/welcome";
 import { NotFound } from "./pages/notFound";
 import { Navbar } from "./component/Navbar";
 import { Footer } from "./component/Footer";
-import { GlobalProvider } from "./store/globalReducer";
+import { GlobalProvider, useGlobalReducer } from "./store/globalReducer";
 import { ProtectedRoute } from "./component/protectedRoute";
+
+// Componente para inicializar la validación de token
+const AppInitializer = ({ children }) => {
+    const { actions } = useGlobalReducer();
+
+    useEffect(() => {
+        // Validar token al cargar la aplicación
+        actions.validateToken();
+    }, []);
+
+    return <>{children}</>;
+};
 
 const App = () => {
     return (
         <GlobalProvider>
             <BrowserRouter>
-                <ScrollToTop>
-                    <Navbar />
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/login" element={<Login />} />
-                        <Route path="/signup" element={<Signup />} />
-                        <Route path="/welcome" element={
-                            <ProtectedRoute>
-                                <Welcome />
-                            </ProtectedRoute>
-                        } />
-                        <Route path="*" element={<NotFound />} />
-                    </Routes>
-                    <Footer />
-                </ScrollToTop>
+                <AppInitializer>
+                    <ScrollToTop>
+                        <Navbar />
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/login" element={<Login />} />
+                            <Route path="/signup" element={<Signup />} />
+                            <Route path="/welcome" element={
+                                <ProtectedRoute>
+                                    <Welcome />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="*" element={<NotFound />} />
+                        </Routes>
+                        <Footer />
+                    </ScrollToTop>
+                </AppInitializer>
             </BrowserRouter>
         </GlobalProvider>
     );

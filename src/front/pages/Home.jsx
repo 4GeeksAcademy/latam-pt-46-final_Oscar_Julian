@@ -1,36 +1,46 @@
-import { useEffect } from "react";
-
-// Asegúrate de tener Font Awesome en tu index.html:
-// <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useGlobalReducer } from "../store/globalReducer";
+import { BackendURL } from "../component/BackendURL";
 
 export const Home = () => {
-  // const { store, dispatch } = useGlobalReducer();
+  const { store, actions, dispatch } = useGlobalReducer();
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  // const loadMessage = async () => {
-  //   try {
-  //     const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const loadMessage = async () => {
+    try {
+      setLoading(true);
+      const backendUrl = store.apiUrl;
 
-  //     if (!backendUrl)
-  //       throw new Error("VITE_BACKEND_URL is not defined in .env file");
+      if (!backendUrl) {
+        return <BackendURL />;
+      }
 
-  //     const response = await fetch(backendUrl + "/api/hello");
-  //     const data = await response.json();
+      const response = await fetch(backendUrl + "/api/hello");
+      const data = await response.json();
 
-  //     if (response.ok) dispatch({ type: "set_hello", payload: data.message });
+      if (response.ok) dispatch({ type: "set_hello", payload: data.message });
 
-  //     return data;
-  //   } catch (error) {
-  //     if (error.message)
-  //       throw new Error(
-  //         `Could not fetch the message from the backend.
-	// 			Please check if the backend is running and the backend port is public.`
-  //       );
-  //   }
-  // };
+      return data;
+    } catch (error) {
+      console.error("Could not fetch message from backend:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // useEffect(() => {
-  //   loadMessage();
-  // }, []);
+  useEffect(() => {
+    loadMessage();
+  }, []);
+
+  const handleStartClick = () => {
+    if (store.isAuthenticated) {
+      navigate("/welcome");
+    } else {
+      navigate("/signup");
+    }
+  };
 
   return (
     <>
@@ -46,9 +56,12 @@ export const Home = () => {
                   descubre nuevas recomendaciones en un solo lugar.
                 </p>
                 <div className="hero-buttons">
-                  <a href="#" className="btn btn-primary btn-lg me-3 slide-up">
+                  <button
+                    className="btn btn-primary btn-lg me-3 slide-up"
+                    onClick={handleStartClick}
+                  >
                     Comenzar
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -271,9 +284,12 @@ export const Home = () => {
               Únete a miles de lectores que ya disfrutan de una experiencia de
               lectura más organizada y enriquecedora.
             </p>
-            <a href="#" className="btn btn-primary btn-lg pulse">
+            <button
+              onClick={() => navigate("/signup")}
+              className="btn btn-primary btn-lg pulse"
+            >
               Crear cuenta gratis
-            </a>
+            </button>
             <p className="mt-3">
               <small>No se requiere tarjeta de crédito</small>
             </p>
