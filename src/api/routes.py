@@ -24,84 +24,113 @@ def handle_hello():
 
 @api.route('/signup', methods=['POST'])
 def signup():
-    data = request.get_json()
-
-    # Validate required fields
-    if not data or not data.get('email') or not data.get('password'):
-        return jsonify({"message": "Email and password are required"}), 400
-
-    # Check if user already exists
-    user_exists = User.query.filter_by(email=data['email'].lower()).first()
-    if user_exists:
-        return jsonify({"message": "Email already registered"}), 400
-
-    # Create new user
-    hashed_password = generate_password_hash(data['password'])
-    new_user = User(
-        email=data['email'].lower(),
-        password=hashed_password,
-        is_active=True
-    )
-
-    db.session.add(new_user)
     try:
-        db.session.commit()
-        return jsonify({"message": "User created successfully"}), 201
+        # Get request data
+        data = request.get_json()
+        print("Data: " + data)
+        # Validate required fields
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+
+        if not data.get('email') or not data.get('password'):
+            return jsonify({"message": "Email and password are required"}), 400
+
+        # Check if user already exists
+        user_exists = User.query.filter_by(email=data['email'].lower()).first()
+        if user_exists:
+            return jsonify({"message": "Email already registered"}), 400
+
+        # Create new user
+        hashed_password = generate_password_hash(data['password'])
+        new_user = User(
+            email=data['email'].lower(),
+            password=hashed_password,
+            is_active=True
+        )
+
+        db.session.add(new_user)
+
+        try:
+            db.session.commit()
+            return jsonify({"message": "User created successfully"}), 201
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": f"Error creating user: {str(e)}"}), 500
+
     except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": f"Error creating user: {str(e)}"}), 500
+        # Catch any unexpected errors and return a proper JSON response
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 
 @api.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    try:
+        data = request.get_json()
 
-    # Validate required fields
-    if not data or not data.get('email') or not data.get('password'):
-        return jsonify({"message": "Email and password are required"}), 400
+        # Validate required fields
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
 
-    # Find the user
-    user = User.query.filter_by(email=data['email'].lower()).first()
+        if not data.get('email') or not data.get('password'):
+            return jsonify({"message": "Email and password are required"}), 400
 
-    # Check if user exists and password is correct
-    if not user or not check_password_hash(user.password, data['password']):
-        return jsonify({"message": "Invalid email or password"}), 401
+        # Find the user
+        user = User.query.filter_by(email=data['email'].lower()).first()
 
-    # Check if user is active
-    if not user.is_active:
-        return jsonify({"message": "User account is not active"}), 401
+        # Check if user exists and password is correct
+        if not user or not check_password_hash(user.password, data['password']):
+            return jsonify({"message": "Invalid email or password"}), 401
 
-    # Create access token
-    access_token = create_access_token(identity=user.id)
+        # Check if user is active
+        if not user.is_active:
+            return jsonify({"message": "User account is not active"}), 401
 
-    return jsonify({
-        "message": "Logged in successfully",
-        "user": user.serialize(),
-        "token": access_token
-    }), 200
+        # Create access token
+        access_token = create_access_token(identity=user.id)
+
+        return jsonify({
+            "message": "Logged in successfully",
+            "user": user.serialize(),
+            "token": access_token
+        }), 200
+
+    except Exception as e:
+        # Catch any unexpected errors
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 
 @api.route('/user', methods=['GET'])
 @jwt_required()
 def get_user():
-    # Get the user's identity from the JWT
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    try:
+        # Get the user's identity from the JWT
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
 
-    if not user:
-        return jsonify({"message": "User not found"}), 404
+        if not user:
+            return jsonify({"message": "User not found"}), 404
 
-    return jsonify(user.serialize()), 200
+        return jsonify(user.serialize()), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 
 @api.route('/protected', methods=['GET'])
 @jwt_required()
 def protected():
-    # Access the identity of the current user with get_jwt_identity
-    current_user_id = get_jwt_identity()
-    user = User.query.get(current_user_id)
+    try:
+        # Access the identity of the current user with get_jwt_identity
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
 
-    return jsonify({
-        "message": f"Hello, {user.email}! This is a protected route.",
-        "user_id": current_user_id
-    }), 200
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+
+        return jsonify({
+            "message": f"Hello, {user.email}! This is a protected route.",
+            "user_id": current_user_id
+        }), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Server error: {str(e)}"}), 500

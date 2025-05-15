@@ -3,14 +3,17 @@ const getState = ({ getStore, getActions, setStore }) => {
         store: {
             user: null,
             isAuthenticated: false,
-            apiUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3001", // Updated to use import.meta.env instead of process.env
-            message: null
+            apiUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3001",
+            message: null,
+            isLoading: false
         },
         actions: {
             // Use getActions to call a function within a function
             signup: async (email, password) => {
                 const store = getStore();
 
+                setStore({ isLoading: true });
+                console.log(store.apiUrl)
                 try {
                     const response = await fetch(`${store.apiUrl}/api/signup`, {
                         method: "POST",
@@ -23,24 +26,56 @@ const getState = ({ getStore, getActions, setStore }) => {
                         })
                     });
 
-                    const data = await response.json();
-
+                    // First check if the response is ok before trying to parse JSON
                     if (!response.ok) {
-                        setStore({ message: data.message || "Signup failed" });
+                        // Try to parse the error message if possible
+                        let errorMessage = "Signup failed";
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.message || errorMessage;
+                        } catch (jsonError) {
+                            // If JSON parsing fails, use HTTP status text
+                            errorMessage = `Signup failed: ${response.statusText || errorMessage}`;
+                        }
+
+                        setStore({
+                            message: errorMessage,
+                            isLoading: false
+                        });
                         return false;
                     }
 
-                    setStore({ message: "Signup successful! Please login." });
-                    return true;
+                    // The response is ok, now try to parse it
+                    try {
+                        const data = await response.json();
+                        setStore({
+                            message: data.message || "Signup successful! Please login.",
+                            isLoading: false
+                        });
+                        return true;
+                    } catch (jsonError) {
+                        // If there's no JSON but the response was OK, still consider it a success
+                        console.warn("Warning: Received empty or invalid JSON response on successful signup");
+                        setStore({
+                            message: "Signup successful! Please login.",
+                            isLoading: false
+                        });
+                        return true;
+                    }
                 } catch (error) {
                     console.error("Signup error:", error);
-                    setStore({ message: "An error occurred during signup" });
+                    setStore({
+                        message: "Network error. Please check your connection and try again.",
+                        isLoading: false
+                    });
                     return false;
                 }
             },
 
             login: async (email, password) => {
                 const store = getStore();
+
+                setStore({ isLoading: true });
 
                 try {
                     const response = await fetch(`${store.apiUrl}/api/login`, {
@@ -54,12 +89,27 @@ const getState = ({ getStore, getActions, setStore }) => {
                         })
                     });
 
-                    const data = await response.json();
-
+                    // Check if the response is ok before trying to parse JSON
                     if (!response.ok) {
-                        setStore({ message: data.message || "Login failed" });
+                        // Try to parse the error message if possible
+                        let errorMessage = "Login failed";
+                        try {
+                            const errorData = await response.json();
+                            errorMessage = errorData.message || errorMessage;
+                        } catch (jsonError) {
+                            // If JSON parsing fails, use HTTP status text
+                            errorMessage = `Login failed: ${response.statusText || errorMessage}`;
+                        }
+
+                        setStore({
+                            message: errorMessage,
+                            isLoading: false
+                        });
                         return false;
                     }
+
+                    // Parse the response JSON
+                    const data = await response.json();
 
                     // Save token to sessionStorage
                     sessionStorage.setItem("token", data.token);
@@ -68,13 +118,17 @@ const getState = ({ getStore, getActions, setStore }) => {
                     setStore({
                         user: data.user,
                         isAuthenticated: true,
-                        message: "Login successful!"
+                        message: data.message || "Login successful!",
+                        isLoading: false
                     });
 
                     return true;
                 } catch (error) {
                     console.error("Login error:", error);
-                    setStore({ message: "An error occurred during login" });
+                    setStore({
+                        message: "Network error. Please check your connection and try again.",
+                        isLoading: false
+                    });
                     return false;
                 }
             },
