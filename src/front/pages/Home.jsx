@@ -4,36 +4,6 @@ import { useGlobalReducer } from "../store/globalReducer";
 import { BackendURL } from "../component/BackendURL";
 
 export const Home = () => {
-  const { store, actions, dispatch } = useGlobalReducer();
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  const loadMessage = async () => {
-    try {
-      setLoading(true);
-      const backendUrl = store.apiUrl;
-
-      if (!backendUrl) {
-        return <BackendURL />;
-      }
-
-      const response = await fetch(backendUrl + "/api/hello");
-      const data = await response.json();
-
-      if (response.ok) dispatch({ type: "set_hello", payload: data.message });
-
-      return data;
-    } catch (error) {
-      console.error("Could not fetch message from backend:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadMessage();
-  }, []);
-
   const handleStartClick = () => {
     if (store.isAuthenticated) {
       navigate("/welcome");
