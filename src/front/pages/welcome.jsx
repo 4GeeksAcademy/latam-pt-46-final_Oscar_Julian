@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from "react";
+
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Context } from "../store/authContext";
+import { useGlobalReducer } from "../store/globalReducer";
 
 export const Welcome = () => {
-    const { store, actions } = useContext(Context);
+    const { store, actions } = useGlobalReducer();
     const navigate = useNavigate();
 
-    // Redirect if not logged in
+    // Redirigir si no está logueado
     useEffect(() => {
         if (!store.isAuthenticated) {
             navigate("/login");
@@ -18,7 +19,7 @@ export const Welcome = () => {
         navigate("/login");
     };
 
-    // If not authenticated, show loading or nothing
+    // Si no está autenticado, mostrar carga o nada
     if (!store.isAuthenticated) {
         return null;
     }

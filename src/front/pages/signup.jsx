@@ -1,9 +1,9 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../store/authContext";
+import { useGlobalReducer } from "../store/globalReducer";
 
 export const Signup = () => {
-  const { store, actions } = useContext(Context);
+  const { store, actions } = useGlobalReducer();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -11,7 +11,7 @@ export const Signup = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirigir si ya está logueado
   useEffect(() => {
     if (store.isAuthenticated) {
       navigate("/welcome");
@@ -24,7 +24,7 @@ export const Signup = () => {
     setIsSubmitting(true);
 
     try {
-      // Validate form
+      // Validar formulario
       if (!email || !password || !confirmPassword) {
         setError("All fields are required");
         setIsSubmitting(false);
@@ -43,12 +43,10 @@ export const Signup = () => {
         return;
       }
 
-      console.log("Data: " + email + password);
-      
-      // Try to sign up
+      // Intentar registrarse
       const success = await actions.signup(email, password);
       if (success) {
-        // Redirect to login on success
+        // Redirigir a login en caso de éxito
         navigate("/login");
       }
     } catch (err) {

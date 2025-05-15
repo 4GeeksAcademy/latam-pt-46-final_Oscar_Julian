@@ -1,16 +1,16 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../store/authContext";
+import { useGlobalReducer } from "../store/globalReducer";
 
 export const Login = () => {
-  const { store, actions } = useContext(Context);
+  const { store, actions } = useGlobalReducer();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  // Redirect if already logged in
+  // Redirigir si ya está logueado
   useEffect(() => {
     if (store.isAuthenticated) {
       navigate("/welcome");
@@ -23,19 +23,19 @@ export const Login = () => {
     setIsSubmitting(true);
 
     try {
-      // Validate form
+      // Validar formulario
       if (!email || !password) {
         setError("Email and password are required");
         setIsSubmitting(false);
         return;
       }
 
-      // Try to log in
+      // Intentar iniciar sesión
       const success = await actions.login(email, password);
       if (success) {
         navigate("/welcome");
       } else {
-        // If the store already has an error message, use that
+        // Si el store ya tiene un mensaje de error, usarlo
         if (store.message) {
           setError(store.message);
           actions.clearMessage();

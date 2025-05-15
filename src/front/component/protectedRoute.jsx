@@ -1,11 +1,11 @@
-import React, { useContext } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
-import { Context } from "../store/authContext";
+import { useGlobalReducer } from "../store/globalReducer";
 
 export const ProtectedRoute = ({ children }) => {
-    const { store } = useContext(Context);
+    const { store } = useGlobalReducer();
 
-    // If not authenticated, redirect to login
+    // Si no está autenticado, redirigir a login
     if (!store.isAuthenticated) {
         return <Navigate to="/login" />;
     }

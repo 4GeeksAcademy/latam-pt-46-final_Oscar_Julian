@@ -1,17 +1,14 @@
-"""
-This module takes care of starting the API Server, Loading the DB and Adding the endpoints
-"""
-from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
-from api.utils import generate_sitemap, APIException
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from flask_cors import CORS
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+from werkzeug.security import generate_password_hash, check_password_hash
+from api.utils import generate_sitemap, APIException
+from api.models import db, User
+from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
-CORS(api)
+CORS(api, resources={r"/api/*": {"origins": "*"}})
 
 
 @api.route('/hello', methods=['POST', 'GET'])
@@ -27,7 +24,7 @@ def signup():
     try:
         # Get request data
         data = request.get_json()
-        print("Data: " + data)
+
         # Validate required fields
         if not data:
             return jsonify({"message": "No data provided"}), 400
