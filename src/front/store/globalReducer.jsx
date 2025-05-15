@@ -3,28 +3,12 @@ import { createContext, useContext, useReducer, useEffect } from 'react';
 // Crear el contexto
 export const GlobalContext = createContext();
 
-// Función auxiliar para manejar URLs en GitHub Codespaces
-const getCorrectBackendUrl = () => {
-    // Para entornos de desarrollo de GitHub Codespaces, usamos una URL fija
-    if (typeof window !== 'undefined' && window.location.href.includes('github.dev')) {
-        // Obtener el nombre del entorno desde la URL actual
-        const urlParts = window.location.hostname.split('-');
-        const envName = urlParts[0] + '-' + urlParts[1];
-        const port = '3001'; // Puerto del backend
-
-        // Construir una URL correcta para GitHub Codespaces
-        return `https://${envName}-${port}.app.github.dev`;
-    }
-
-    // Para entornos normales, usar la URL configurada
-    return import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
-};
-
 // Estado inicial de la aplicación
 const initialState = {
     user: null,
     isAuthenticated: false,
-    apiUrl: getCorrectBackendUrl(), // Usamos nuestra función auxiliar aquí
+    // Fix: Ensure apiUrl doesn't have trailing slashes and is properly formed
+    apiUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3001",
     message: null,
     isLoading: false
 };
@@ -37,8 +21,7 @@ export const ACTIONS = {
     CLEAR_MESSAGE: 'clear_message',
     SET_LOADING: 'set_loading',
     LOGOUT: 'logout',
-    SET_HELLO: 'set_hello', // Para el mensaje de bienvenida/ejemplo
-    SET_API_URL: 'set_api_url' // Para actualizar la URL de la API si es necesario
+    SET_HELLO: 'set_hello' // Para el mensaje de bienvenida/ejemplo
 };
 
 // Reducer para manejar las acciones
@@ -58,8 +41,6 @@ function reducer(state, action) {
             return { ...state, user: null, isAuthenticated: false, message: "Logged out successfully" };
         case ACTIONS.SET_HELLO:
             return { ...state, hello: action.payload };
-        case ACTIONS.SET_API_URL:
-            return { ...state, apiUrl: action.payload };
         default:
             return state;
     }
@@ -74,11 +55,17 @@ export const useGlobalReducer = () => {
     return context;
 };
 
+// Debug function to help with URL issues
+const logApiCall = (endpoint, url) => {
+    console.log(`API call to ${endpoint}:`, url);
+    return url;
+};
+
 // Proveedor que envuelve la aplicación
 export const GlobalProvider = ({ children }) => {
     const [store, dispatch] = useReducer(reducer, initialState);
 
-    // Log de la URL que estamos usando
+    // For debugging - log the API URL on load
     useEffect(() => {
         console.log("Current API URL:", store.apiUrl);
     }, [store.apiUrl]);
@@ -89,8 +76,10 @@ export const GlobalProvider = ({ children }) => {
             const token = sessionStorage.getItem("token");
             if (token) {
                 try {
-                    console.log(`Validating token with URL: ${store.apiUrl}/api/user`);
-                    const response = await fetch(`${store.apiUrl}/api/user`, {
+                    const apiUrl = `${store.apiUrl}/api/user`;
+                    console.log("Validating token using URL:", apiUrl);
+
+                    const response = await fetch(apiUrl, {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${token}`
@@ -103,6 +92,7 @@ export const GlobalProvider = ({ children }) => {
                         dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: true });
                     } else {
                         // Token inválido o expirado
+                        console.log("Token validation failed:", response.status);
                         sessionStorage.removeItem("token");
                     }
                 } catch (error) {
@@ -121,17 +111,16 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                console.log(`Sending signup request to: ${store.apiUrl}/api/signup`);
+                const apiUrl = `${store.apiUrl}/api/signup`;
+                console.log("Signup request to:", apiUrl);
 
-                const response = await fetch(`${store.apiUrl}/api/signup`, {
+                const response = await fetch(apiUrl, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ email, password })
                 });
-
-                console.log("Signup response status:", response.status);
 
                 if (!response.ok) {
                     let errorMessage = "Signup failed";
@@ -142,7 +131,6 @@ export const GlobalProvider = ({ children }) => {
                         errorMessage = `Signup failed: ${response.statusText || errorMessage}`;
                     }
 
-                    console.error("Signup error:", errorMessage);
                     dispatch({ type: ACTIONS.SET_MESSAGE, payload: errorMessage });
                     dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                     return false;
@@ -165,7 +153,7 @@ export const GlobalProvider = ({ children }) => {
                     return true;
                 }
             } catch (error) {
-                console.error("Signup network error:", error);
+                console.error("Signup error:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Network error. Please check your connection and try again."
@@ -179,9 +167,10 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                console.log(`Sending login request to: ${store.apiUrl}/api/login`);
+                const apiUrl = `${store.apiUrl}/api/login`;
+                console.log("Login request to:", apiUrl);
 
-                const response = await fetch(`${store.apiUrl}/api/login`, {
+                const response = await fetch(apiUrl, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -247,8 +236,10 @@ export const GlobalProvider = ({ children }) => {
             }
 
             try {
-                console.log(`Validating token with: ${store.apiUrl}/api/user`);
-                const response = await fetch(`${store.apiUrl}/api/user`, {
+                const apiUrl = `${store.apiUrl}/api/user`;
+                console.log("Validating token using URL:", apiUrl);
+
+                const response = await fetch(apiUrl, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -257,6 +248,7 @@ export const GlobalProvider = ({ children }) => {
 
                 if (!response.ok) {
                     // Token inválido
+                    console.log("Token validation failed:", response.status);
                     sessionStorage.removeItem("token");
                     dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: false });
                     dispatch({ type: ACTIONS.SET_USER, payload: null });
@@ -276,11 +268,6 @@ export const GlobalProvider = ({ children }) => {
 
         clearMessage: () => {
             dispatch({ type: ACTIONS.CLEAR_MESSAGE });
-        },
-
-        // Añadir una acción para actualizar manualmente la URL de la API si es necesario
-        updateApiUrl: (newUrl) => {
-            dispatch({ type: ACTIONS.SET_API_URL, payload: newUrl });
         }
     };
 
