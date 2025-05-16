@@ -77,11 +77,12 @@ export const FilterBar = () => {
     };
 
     // Aplicar ordenamiento cuando cambian los parámetros de ordenamiento
+    // FIX: Add sortBy and sortOrder to dependency array, and remove store.books
     useEffect(() => {
         if (store.books && store.books.length > 0) {
             applySort();
         }
-    }, [sortBy, sortOrder, store.books]);
+    }, [sortBy, sortOrder]); // Removed store.books from dependencies
 
     return (
         <div className="filter-bar p-3 mb-4 rounded shadow-sm">
