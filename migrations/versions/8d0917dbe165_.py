@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 0fd8939397a4
+Revision ID: 8d0917dbe165
 Revises: 0763d677d453
-Create Date: 2025-05-16 17:01:53.101988
+Create Date: 2025-05-16 17:56:10.283606
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '0fd8939397a4'
+revision = '8d0917dbe165'
 down_revision = '0763d677d453'
 branch_labels = None
 depends_on = None
@@ -113,7 +113,7 @@ def downgrade():
     sa.Column('password', sa.VARCHAR(), autoincrement=False, nullable=False),
     sa.Column('is_active', sa.BOOLEAN(), autoincrement=False, nullable=False),
     sa.PrimaryKeyConstraint('id', name='user_pkey'),
-    sa.UniqueConstraint('email', name='user_email_key')
+    sa.UniqueConstraint('email', name='user_email_key', postgresql_include=[], postgresql_nulls_not_distinct=False)
     )
     op.drop_table('user_reviews')
     op.drop_table('user_books')
