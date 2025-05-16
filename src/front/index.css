@@ -29,6 +29,11 @@ a:hover {
   text-decoration: none;
 }
 
+/* Navbar */
+.navigator {
+  background-color: var(--background);
+}
+
 /* Hero Section */
 .hero-section {
   background-color: var(--light-accent);

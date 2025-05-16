@@ -18,11 +18,11 @@ export const Home = () => {
   }, []);
 
   // Redirección si no está autenticado
-  useEffect(() => {
-    if (!loading && !store.isAuthenticated) {
-      navigate("/login");
-    }
-  }, [store.isAuthenticated, loading]);
+  // useEffect(() => {
+  //   if (!loading && !store.isAuthenticated) {
+  //     navigate("/login");
+  //   }
+  // }, [store.isAuthenticated, loading]);
 
   const handleStartClick = () => {
     navigate("/welcome");
@@ -40,9 +40,9 @@ export const Home = () => {
   }
 
   // No renderizar nada si no está autenticado
-  if (!store.isAuthenticated) {
-    return null;
-  }
+  // if (!store.isAuthenticated) {
+  //   return null;
+  // }
   return (
     <>
       {/* Hero Section */}
@@ -80,7 +80,7 @@ export const Home = () => {
       </header>
 
       {/* Features Section */}
-      <section className="features-section py-5">
+      <section id="features-section" className="features-section py-5">
         <div className="container">
           <div className="section-header text-center mb-5">
             <h2>Características principales</h2>
@@ -130,7 +130,7 @@ export const Home = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="how-it-works-section py-5">
+      <section id="how-it-works-section" className="how-it-works-section py-5">
         <div className="container">
           <div className="section-header text-center mb-5">
             <h2>Cómo funciona</h2>
@@ -191,7 +191,7 @@ export const Home = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="testimonials-section py-5">
+      <section id="testimonials-section" className="testimonials-section py-5">
         <div className="container">
           <div className="section-header text-center mb-5">
             <h2>Lo que dicen nuestros usuarios</h2>

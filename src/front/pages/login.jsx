@@ -33,7 +33,7 @@ export const Login = () => {
       // Intentar iniciar sesión
       const success = await actions.login(email, password);
       if (success) {
-        navigate("/");
+        navigate("/welcome");
       } else {
         // Si el store ya tiene un mensaje de error, usarlo
         if (store.message) {

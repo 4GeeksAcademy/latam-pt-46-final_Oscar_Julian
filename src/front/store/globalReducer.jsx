@@ -78,7 +78,7 @@ export const GlobalProvider = ({ children }) => {
             
             if (token) {
                 try {
-                    const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/user`;
+                    const apiUrl = `${store.apiUrl}/api/user`;
                     console.log("Validating token using URL:", apiUrl);
 
                     const response = await fetch(apiUrl, {
@@ -113,7 +113,7 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/signup`;
+                const apiUrl = `${store.apiUrl}/api/signup`;
                 console.log("Signup request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
@@ -169,7 +169,7 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/login`;
+                const apiUrl = `${store.apiUrl}/api/login`;
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
@@ -236,7 +236,7 @@ export const GlobalProvider = ({ children }) => {
             }
 
             try {
-                const apiUrl = `https://super-space-system-pjgpx5rq9g6r36vg7-3001.app.github.dev/api/user`;
+                const apiUrl = `${store.apiUrl}/api/user`;
 
                 const response = await fetch(apiUrl, {
                     method: "GET",
