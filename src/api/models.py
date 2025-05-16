@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, String, Integer, Text, Date, BigInteger, TIMESTAMP
+from sqlalchemy import ForeignKey, String, Integer, Text, Date, BigInteger, TIMESTAMP, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import List, Optional
 
@@ -21,6 +21,15 @@ class Author(db.Model):
 
     books: Mapped[List["Book"]] = relationship("Book", back_populates="author")
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "full_name": self.full_name,
+            "birth_year": self.birth_year,
+            "death_year": self.death_year
+        }
+
+
 class Book(db.Model):
     __tablename__ = 'books'
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
@@ -37,12 +46,32 @@ class Book(db.Model):
     user_books: Mapped[List["UserBook"]] = relationship("UserBook", back_populates="book")
     reviews: Mapped[List["UserReview"]] = relationship("UserReview", back_populates="book")
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "author": self.author.full_name if self.author else None,
+            "created_date": self.created_date.isoformat(),
+            "isbn": self.isbn,
+            "summary": self.summary,
+            "cover_image_type": self.cover_image_type,
+            "categories": [c.name for c in self.categories]
+        }
+
+
 class Category(db.Model):
     __tablename__ = 'categories'
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
     books: Mapped[List["Book"]] = relationship("Book", secondary=book_categories, back_populates="categories")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
 
 class Gender(db.Model):
     __tablename__ = 'genders'
@@ -51,22 +80,35 @@ class Gender(db.Model):
 
     users: Mapped[List["User"]] = relationship("User", back_populates="gender")
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
+
 class User(db.Model):
     __tablename__ = 'users'
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
-    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    first_name: Mapped[Optional[str]] = mapped_column(String(255))
-    last_name: Mapped[Optional[str]] = mapped_column(String(255))
+    password: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean(False), nullable=False)
     gender_id: Mapped[Optional[int]] = mapped_column(BigInteger, ForeignKey('genders.id'))
-    date_of_birth: Mapped[Optional[Date]] = mapped_column(Date)
 
     gender: Mapped[Optional["Gender"]] = relationship("Gender", back_populates="users")
     favorites: Mapped[List["Favorite"]] = relationship("Favorite", back_populates="user")
     user_books: Mapped[List["UserBook"]] = relationship("UserBook", back_populates="user")
     reviews_written: Mapped[List["UserReview"]] = relationship("UserReview", foreign_keys="[UserReview.reviewer_id]", back_populates="reviewer")
     reviews_received: Mapped[List["UserReview"]] = relationship("UserReview", foreign_keys="[UserReview.reviewee_id]", back_populates="reviewee")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "email": self.email,
+            "is_active": self.is_active,
+            "gender": self.gender.name if self.gender else None
+        }
+
 
 class Favorite(db.Model):
     __tablename__ = 'favorites'
@@ -77,6 +119,15 @@ class Favorite(db.Model):
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="favorites")
     book: Mapped[Optional["Book"]] = relationship("Book", back_populates="favorites")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "book_id": self.book_id,
+            "added_at": str(self.added_at)
+        }
+
 
 class UserBook(db.Model):
     __tablename__ = 'user_books'
@@ -89,6 +140,17 @@ class UserBook(db.Model):
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="user_books")
     book: Mapped[Optional["Book"]] = relationship("Book", back_populates="user_books")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "book_id": self.book_id,
+            "status": self.status,
+            "rating": self.rating,
+            "review": self.review
+        }
+
 
 class UserReview(db.Model):
     __tablename__ = 'user_reviews'
@@ -103,3 +165,14 @@ class UserReview(db.Model):
     reviewer: Mapped[Optional["User"]] = relationship("User", foreign_keys=[reviewer_id], back_populates="reviews_written")
     reviewee: Mapped[Optional["User"]] = relationship("User", foreign_keys=[reviewee_id], back_populates="reviews_received")
     book: Mapped[Optional["Book"]] = relationship("Book", back_populates="reviews")
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "reviewer_id": self.reviewer_id,
+            "reviewee_id": self.reviewee_id,
+            "book_id": self.book_id,
+            "review_text": self.review_text,
+            "rating": self.rating,
+            "created_at": str(self.created_at)
+        }

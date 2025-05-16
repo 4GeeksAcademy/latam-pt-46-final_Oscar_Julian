@@ -25,6 +25,8 @@ export const Signup = () => {
 
     try {
       // Validar formulario
+      console.log(password);
+      
       if (!email || !password || !confirmPassword) {
         setError("All fields are required");
         setIsSubmitting(false);
