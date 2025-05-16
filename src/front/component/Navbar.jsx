@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
+import { SearchBar } from "./SearchBar";
 
 export const Navbar = () => {
 	const { store, actions } = useGlobalReducer();
@@ -23,30 +24,34 @@ export const Navbar = () => {
 				<Link to={!store.isAuthenticated ? "/" : "/welcome"} className="navbar-brand">
 					<img className="img-fluid" src="https://www.ellibrototal.com/estaticosED/files/img/ltotalLogo2.svg" alt="Logo de El Libro Total" style={{ height: '40px' }} />
 				</Link>
+
+				{/* Barra de búsqueda (solo visible cuando está autenticado) */}
+				{store.isAuthenticated && <SearchBar />}
+
 				<div className="btn-group shadow-0 w-auto" role="group" aria-label="Main Navigation">
 					{!store.isAuthenticated ? (
 						<>
-							<Link to="/" className="btn btn-outline-primary home-btn">
+							<Link to="/" className="btn btn-outline-light home-btn">
 								<i className="fa-solid fa-house me-1"></i>
 								<span className="text-span">Inicio</span>
 							</Link>
-							<button onClick={() => scrollToSection('features-section')} className="btn btn-outline-primary features-btn">
+							<button onClick={() => scrollToSection('features-section')} className="btn btn-outline-light features-btn">
 								<i className="fa-solid fa-star me-1"></i>
 								<span className="text-span">Características</span>
 							</button>
-							<button onClick={() => scrollToSection('how-it-works-section')} className="btn btn-outline-primary how-it-works-btn">
+							<button onClick={() => scrollToSection('how-it-works-section')} className="btn btn-outline-light how-it-works-btn">
 								<i className="fa-solid fa-question-circle me-1"></i>
 								<span className="text-span">Cómo Funciona</span>
 							</button>
-							<button onClick={() => scrollToSection('testimonials-section')} className="btn btn-outline-primary testimonials-btn">
+							<button onClick={() => scrollToSection('testimonials-section')} className="btn btn-outline-light testimonials-btn">
 								<i className="fa-solid fa-comments me-1"></i>
 								<span className="text-span">Testimonios</span>
 							</button>
 						</>
 					) : (
 						<>
-							<Link to="/welcome" className="btn btn-outline-primary home-btn">
-								<i className="fa-solid fa-house me-1"></i>
+							<Link to="/welcome" className="btn btn-outline-light home-btn">
+								<i className="fa-solid fa-book me-1"></i>
 								<span className="text-span">Mi Biblioteca</span>
 							</Link>
 						</>
@@ -55,11 +60,11 @@ export const Navbar = () => {
 				<div className="btn-group shadow-0 w-auto" role="group" aria-label="User Actions">
 					{!store.isAuthenticated ? (
 						<>
-							<Link to="/login" className="btn btn-outline-primary login-btn">
+							<Link to="/login" className="btn btn-outline-light login-btn">
 								<i className="fa-solid fa-right-to-bracket me-1"></i>
 								<span className="text-span">Login</span>
 							</Link>
-							<Link to="/signup" className="btn btn-outline-primary signup-btn ms-2">
+							<Link to="/signup" className="btn btn-outline-light signup-btn ms-2">
 								<i className="fa-solid fa-user-plus me-1"></i>
 								<span className="text-span">Registro</span>
 							</Link>
@@ -67,7 +72,7 @@ export const Navbar = () => {
 					) : (
 						<button
 							type="button"
-							className="btn btn-outline-primary logout-btn"
+							className="btn btn-outline-light logout-btn"
 							onClick={handleLogout}
 						>
 							<i className="fa-solid fa-user-minus me-1"></i>

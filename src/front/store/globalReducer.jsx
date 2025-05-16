@@ -10,7 +10,18 @@ const initialState = {
     // Fix: Ensure apiUrl doesn't have trailing slashes and is properly formed
     apiUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3001",
     message: null,
-    isLoading: false
+    isLoading: false,
+    // Nuevos estados para los libros
+    books: [],
+    totalBooks: 0,
+    currentPage: 1,
+    booksPerPage: 7,
+    filters: {
+        search: "",
+        author: "",
+        genre: "",
+        category: ""
+    }
 };
 
 // Tipos de acciones
@@ -21,7 +32,15 @@ export const ACTIONS = {
     CLEAR_MESSAGE: 'clear_message',
     SET_LOADING: 'set_loading',
     LOGOUT: 'logout',
-    SET_HELLO: 'set_hello' // Para el mensaje de bienvenida/ejemplo
+    SET_HELLO: 'set_hello', // Para el mensaje de bienvenida/ejemplo
+
+    // Nuevas acciones para los libros
+    SET_BOOKS: 'set_books',
+    SET_TOTAL_BOOKS: 'set_total_books',
+    SET_CURRENT_PAGE: 'set_current_page',
+    SET_BOOKS_PER_PAGE: 'set_books_per_page',
+    SET_FILTERS: 'set_filters',
+    CLEAR_FILTERS: 'clear_filters'
 };
 
 // Reducer para manejar las acciones
@@ -41,12 +60,38 @@ function reducer(state, action) {
             return { ...state, user: null, isAuthenticated: false, message: "Logged out successfully" };
         case ACTIONS.SET_HELLO:
             return { ...state, hello: action.payload };
+
+        // Nuevos cases para los libros
+        case ACTIONS.SET_BOOKS:
+            return { ...state, books: action.payload };
+        case ACTIONS.SET_TOTAL_BOOKS:
+            return { ...state, totalBooks: action.payload };
+        case ACTIONS.SET_CURRENT_PAGE:
+            return { ...state, currentPage: action.payload };
+        case ACTIONS.SET_BOOKS_PER_PAGE:
+            return { ...state, booksPerPage: action.payload };
+        case ACTIONS.SET_FILTERS:
+            return {
+                ...state,
+                filters: { ...state.filters, ...action.payload }
+            };
+        case ACTIONS.CLEAR_FILTERS:
+            return {
+                ...state,
+                filters: {
+                    search: "",
+                    author: "",
+                    genre: "",
+                    category: ""
+                }
+            };
         default:
             return state;
     }
 }
 
 // Hook personalizado para usar el reducer global
+// Asegúrate de que esta función está exportada correctamente
 export const useGlobalReducer = () => {
     const context = useContext(GlobalContext);
     if (!context) {
@@ -75,7 +120,7 @@ export const GlobalProvider = ({ children }) => {
         const checkToken = async () => {
             const token = sessionStorage.getItem("token");
             console.log(token);
-            
+
             if (token) {
                 try {
                     const apiUrl = `${store.apiUrl}/api/user`;
@@ -194,7 +239,7 @@ export const GlobalProvider = ({ children }) => {
                 }
 
                 const data = await response.json();
-                
+
                 // Guardar token en sessionStorage
                 sessionStorage.setItem("token", data.token);
 
@@ -228,7 +273,7 @@ export const GlobalProvider = ({ children }) => {
 
         validateToken: async () => {
             const token = sessionStorage.getItem("token");
-            
+
             if (!token) {
                 dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: false });
                 dispatch({ type: ACTIONS.SET_USER, payload: null });
@@ -265,6 +310,68 @@ export const GlobalProvider = ({ children }) => {
 
         clearMessage: () => {
             dispatch({ type: ACTIONS.CLEAR_MESSAGE });
+        },
+
+        // Nueva función para obtener libros
+        getBooks: async (page = 1, filters = {}) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                // Construir la URL con parámetros de paginación
+                let apiUrl = `https://gutendex.com/books?page=${page}`;
+
+                // Añadir filtros de búsqueda si existen
+                if (filters.search) {
+                    apiUrl += `&search=${encodeURIComponent(filters.search)}`;
+                }
+
+                console.log("Fetching books from:", apiUrl);
+
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error('Error fetching books');
+                }
+
+                const data = await response.json();
+
+                // Procesar los datos para extraer solo la información necesaria
+                const processedBooks = data.results.map(book => ({
+                    id: book.id,
+                    title: book.title,
+                    author: book.authors.length > 0 ? book.authors[0].name : 'Unknown Author',
+                    coverImage: book.formats['image/jpeg'] || '',
+                    genre: book.subjects && book.subjects.length > 0 ? book.subjects[0] : 'Uncategorized',
+                    category: book.bookshelves && book.bookshelves.length > 0 ? book.bookshelves[0] : 'Uncategorized'
+                }));
+
+                dispatch({ type: ACTIONS.SET_BOOKS, payload: processedBooks });
+                dispatch({ type: ACTIONS.SET_TOTAL_BOOKS, payload: data.count });
+                dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return processedBooks;
+            } catch (error) {
+                console.error("Error fetching books:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Error loading books. Please try again later."
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return [];
+            }
+        },
+
+        setFilters: (filters) => {
+            dispatch({ type: ACTIONS.SET_FILTERS, payload: filters });
+        },
+
+        clearFilters: () => {
+            dispatch({ type: ACTIONS.CLEAR_FILTERS });
+        },
+
+        changePage: (page) => {
+            dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
         }
     };
 
