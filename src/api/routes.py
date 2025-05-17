@@ -142,6 +142,47 @@ def create_book():
         db.session.rollback()
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+@api.route('/books/<int:book_id>', methods=['PUT'])
+@jwt_required()
+def update_book(book_id):
+    try:
+        current_user_id = get_jwt_identity()
+        book = Book.query.get(book_id)
+
+        # Validar existencia del libro
+        if not book:
+            return jsonify({"message": "Book not found"}), 404
+
+        data = request.get_json()
+        
+        # Actualizar campos permitidos
+        if 'title' in data:
+            book.title = data['title']
+        if 'author' in data:
+            book.author = data['author']
+        if 'genre' in data:
+            book.genre = data['genre']
+        if 'category' in data:
+            book.category = data['category']
+        if 'cover_image' in data:
+            book.cover_image = data['cover_image']
+        if 'created_date' in data:
+            book.created_date = datetime.strptime(data['created_date'], "%Y-%m-%d").date()
+
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Book updated successfully",
+            "book": book.serialize()
+        }), 200
+
+    except ValueError as e:
+        db.session.rollback()
+        return jsonify({"message": f"Invalid date format: {str(e)}"}), 400
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
+
 @api.route('/user', methods=['GET'])
 @jwt_required()
 def get_user():
