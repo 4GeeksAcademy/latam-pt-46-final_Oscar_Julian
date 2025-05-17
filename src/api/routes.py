@@ -86,6 +86,27 @@ def login():
         # Catch any unexpected errors
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+@api.route('/books', methods=['GET'])
+def get_all_books():
+    try:
+        # Obtener todos los libros de la base de datos
+        books = Book.query.all()
+        
+        # Serializar los resultados
+        serialized_books = [book.serialize() for book in books]
+        
+        return jsonify({
+            "success": True,
+            "count": len(serialized_books),
+            "data": serialized_books
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error al obtener libros: {str(e)}"
+        }), 500
+
 @api.route('/books', methods=['POST'])
 @jwt_required()
 def create_book():
