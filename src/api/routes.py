@@ -209,26 +209,42 @@ def delete_book(book_id):
             "message": f"Error en el servidor: {str(e)}"
         }), 500
 
-@api.route('/user', methods=['GET'])
+@api.route('/users', methods=['GET'])
 @jwt_required()
-def get_user():
+def get_all_users():
     try:
-        # Get the user's identity from the JWT
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
-
-        if not user:
-            return jsonify({"message": "User not found"}), 404
-
-        return jsonify(user.serialize()), 200
-
+        # Solo accesible para administradores
+        users = User.query.all()
+        return jsonify([user.serialize() for user in users]), 200
     except Exception as e:
-        return jsonify({"message": f"Server error: {str(e)}"}), 500
+        return jsonify({"message": f"Error: {str(e)}"}), 500
 
-
-@api.route('/protected', methods=['GET'])
+@api.route('/users/<int:user_id>', methods=['PUT'])
 @jwt_required()
-def protected():
+def update_user(user_id):
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+            
+        if user.id != current_user_id:
+            return jsonify({"message": "No autorizado"}), 403
+
+        data = request.get_json()
+        if 'email' in data:
+            user.email = data['email'].lower()
+        if 'password' in data:
+            user.password = generate_password_hash(data['password'])
+        
+        db.session.commit()
+        return jsonify(user.serialize()), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
     try:
         # Access the identity of the current user with get_jwt_identity
         current_user_id = get_jwt_identity()
