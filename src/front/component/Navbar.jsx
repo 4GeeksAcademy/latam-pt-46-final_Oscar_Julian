@@ -18,6 +18,14 @@ export const Navbar = () => {
 		}
 	};
 
+	const handleSeedDatabase = async () => {
+		if (window.confirm('¿Estás seguro de querer poblar la base de datos? Esto puede tomar varios minutos.')) {
+			await actions.seedBooks();
+			// Recargar los libros después de sembrar
+			actions.getBooks(store.currentPage);
+		}
+	};
+
 	return (
 		<nav className="navbar justify-content-center p-4 navigator">
 			<div className="container d-flex justify-content-between align-items-center">
@@ -27,6 +35,28 @@ export const Navbar = () => {
 
 				{/* Barra de búsqueda (solo visible cuando está autenticado) */}
 				{store.isAuthenticated && <SearchBar />}
+
+				<div className="btn-group shadow-0 w-auto" role="group" aria-label="User Actions">
+					{store.isAuthenticated && (
+						<button 
+							className="btn btn-warning mt-3"
+							onClick={handleSeedDatabase}
+							disabled={store.isSeeding}
+						>
+							{store.isSeeding ? (
+								<>
+									<span className="spinner-border spinner-border-sm" role="status"></span>
+									Sembrando... {store.seedingProgress}%
+								</>
+							) : (
+								<>
+									<i className="fa-solid fa-database me-2"></i>
+									Poblar Base de Datos
+								</>
+							)}
+						</button>
+					)}
+				</div>
 
 				<div className="btn-group shadow-0 w-auto" role="group" aria-label="Main Navigation">
 					{!store.isAuthenticated ? (

@@ -1,8 +1,9 @@
+from datetime import datetime  # Change the import
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
-from api.models import db, User
+from api.models import db, User, Book
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
@@ -49,7 +50,6 @@ def signup():
         # Catch any unexpected errors and return a proper JSON response
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
-
 @api.route('/login', methods=['POST'])
 def login():
     try:
@@ -86,6 +86,40 @@ def login():
         # Catch any unexpected errors
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+@api.route('/books', methods=['POST'])
+@jwt_required()
+def create_book():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+
+        required_fields = ['title', 'author', 'created_date']
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": f"Missing required fields: {required_fields}"}), 400
+
+        current_user_id = get_jwt_identity()
+
+        # Crear nuevo libro
+        new_book = Book(
+            title=data['title'],
+            author=data['author'],
+            genre=data.get('genre'),
+            category=data.get('category'),
+            cover_image=data.get('cover_image'),
+            created_date=datetime.strptime(data['created_date'], "%Y-%m-%d").date(),
+            user_id=current_user_id
+        )
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return jsonify({"message": "Book created successfully", "book": new_book.serialize()}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 @api.route('/user', methods=['GET'])
 @jwt_required()

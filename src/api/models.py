@@ -61,6 +61,7 @@ class Book(db.Model):
     genre: Mapped[Optional[str]] = mapped_column(Text)
     category: Mapped[Optional[str]] = mapped_column(Text)
     created_date: Mapped[date] = mapped_column(Date, nullable=False)
+    
     user_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"))
     user: Mapped[Optional["User"]] = relationship(back_populates="books")

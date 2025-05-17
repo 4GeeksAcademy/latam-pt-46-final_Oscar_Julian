@@ -21,7 +21,9 @@ const initialState = {
         author: "",
         genre: "",
         category: ""
-    }
+    },
+    isSeeding: false,
+    seedingProgress: 0
 };
 
 // Tipos de acciones
@@ -40,7 +42,11 @@ export const ACTIONS = {
     SET_CURRENT_PAGE: 'set_current_page',
     SET_BOOKS_PER_PAGE: 'set_books_per_page',
     SET_FILTERS: 'set_filters',
-    CLEAR_FILTERS: 'clear_filters'
+    CLEAR_FILTERS: 'clear_filters',
+
+    // Siembra de libros
+    SEED_BOOKS: 'seed_books',
+    SET_SEEDING_PROGRESS: 'set_seeding_progress'
 };
 
 // Reducer para manejar las acciones
@@ -85,6 +91,12 @@ function reducer(state, action) {
                     category: ""
                 }
             };
+
+        // Siembra de Libros
+        case ACTIONS.SEED_BOOKS:
+            return { ...state, isSeeding: action.payload };
+        case ACTIONS.SET_SEEDING_PROGRESS:
+            return { ...state, seedingProgress: action.payload };
         default:
             return state;
     }
@@ -119,7 +131,6 @@ export const GlobalProvider = ({ children }) => {
     useEffect(() => {
         const checkToken = async () => {
             const token = sessionStorage.getItem("token");
-            console.log(token);
 
             if (token) {
                 try {
@@ -372,6 +383,54 @@ export const GlobalProvider = ({ children }) => {
 
         changePage: (page) => {
             dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
+        },
+
+        // Siembra de Libros
+        seedBooks: async () => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+            dispatch({ type: ACTIONS.SEED_BOOKS, payload: true });
+            
+            try {
+                const totalPages = 10;
+                let booksSeeded = 0;
+                
+                for(let page = 1; page <= totalPages; page++) {
+                    const gutendexUrl = `https://gutendex.com/books?page=${page}`;
+                    const response = await fetch(gutendexUrl);
+                    const data = await response.json();
+                    
+                    for(const book of data.results) {
+                        const processedBook = {
+                            title: book.title,
+                            author: book.authors?.[0]?.name || 'Unknown Author',
+                            genre: book.subjects?.[0] || 'General',
+                            category: book.bookshelves?.[0] || 'Uncategorized',
+                            cover_image: book.formats?.['image/jpeg'] || '',
+                            created_date: new Date().toISOString().split('T')[0]
+                        };
+
+                        await fetch(`${store.apiUrl}/api/books`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify(processedBook)
+                        });
+                        
+                        booksSeeded++;
+                        const progress = Math.round((booksSeeded / (totalPages * 32)) * 100);
+                        dispatch({ type: ACTIONS.SET_SEEDING_PROGRESS, payload: progress });
+                    }
+                }
+                
+                dispatch({ type: ACTIONS.SET_MESSAGE, payload: '¡Base de datos poblada exitosamente!' });
+            } catch (error) {
+                dispatch({ type: ACTIONS.SET_MESSAGE, payload: 'Error al poblar la base de datos' });
+            } finally {
+                dispatch({ type: ACTIONS.SEED_BOOKS, payload: false });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+            }
         }
     };
 
