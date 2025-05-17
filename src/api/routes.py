@@ -183,6 +183,32 @@ def update_book(book_id):
         db.session.rollback()
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+@api.route('/books/<int:book_id>', methods=['DELETE'])
+@jwt_required()
+def delete_book(book_id):
+    try:
+        current_user_id = get_jwt_identity()
+        book = Book.query.get(book_id)
+
+        # Validar existencia del libro
+        if not book:
+            return jsonify({"message": "Libro no encontrado"}), 404
+
+        # Eliminar el libro
+        db.session.delete(book)
+        db.session.commit()
+        
+        return jsonify({
+            "message": "Libro eliminado exitosamente",
+            "deleted_book_id": book_id
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({
+            "message": f"Error en el servidor: {str(e)}"
+        }), 500
+
 @api.route('/user', methods=['GET'])
 @jwt_required()
 def get_user():
