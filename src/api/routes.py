@@ -2,7 +2,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
-from api.models import db, User, Author, Category, Book
+from api.models import db, User
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
@@ -123,9 +123,9 @@ def protected():
     except Exception as e:
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
-@api.route('/books', methods=['POST'])
-@jwt_required()
-def create_book():
+# @api.route('/books', methods=['POST'])
+# @jwt_required()
+# def create_book():
     try:
         data = request.get_json()
         required_fields = ['title', 'author_id', 'created_date']
