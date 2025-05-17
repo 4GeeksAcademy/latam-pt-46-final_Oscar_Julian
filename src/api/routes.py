@@ -2,7 +2,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
-from api.models import db, User
+from api.models import db, User, Author, Category, Book
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
@@ -121,4 +121,46 @@ def protected():
         }), 200
 
     except Exception as e:
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
+
+@api.route('/books', methods=['POST'])
+@jwt_required()
+def create_book():
+    try:
+        data = request.get_json()
+        required_fields = ['title', 'author_id', 'created_date']
+
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": f"Missing fields. Required: {required_fields}"}), 400
+
+        # Verifica que el autor exista
+        author = Author.query.get(data['author_id'])
+        if not author:
+            return jsonify({"message": "Author not found"}), 404
+
+        # Crea el libro
+        new_book = Book(
+            title=data['title'],
+            author_id=data['author_id'],
+            created_date=data['created_date'],
+            isbn=data.get('isbn'),
+            summary=data.get('summary'),
+            cover_image_type=data.get('cover_image_type', 'image/jpeg')
+        )
+
+        # Agrega categorías si vienen en la petición
+        category_ids = data.get('category_ids', [])
+        if category_ids:
+            categories = Category.query.filter(Category.id.in_(category_ids)).all()
+            if not categories or len(categories) != len(category_ids):
+                return jsonify({"message": "Some categories not found"}), 404
+            new_book.categories = categories
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return jsonify(new_book.serialize()), 201
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify({"message": f"Server error: {str(e)}"}), 500
