@@ -11,6 +11,7 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
+#  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------
 @api.route('/signup', methods=['POST'])
 def signup():
     try:
@@ -86,6 +87,7 @@ def login():
         # Catch any unexpected errors
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+#  --------------------------------------------- BOOKS ---------------------------------------------------------------------
 @api.route('/books', methods=['GET'])
 def get_all_books():
     try:
@@ -209,6 +211,24 @@ def delete_book(book_id):
             "message": f"Error en el servidor: {str(e)}"
         }), 500
 
+#  --------------------------------------------- USER ---------------------------------------------------------------------
+
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user():
+    try:
+        # Get the user's identity from the JWT
+        current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+
+        return jsonify(user.serialize()), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
+
 @api.route('/users', methods=['GET'])
 @jwt_required()
 def get_all_users():
@@ -245,60 +265,4 @@ def update_user(user_id):
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
-    try:
-        # Access the identity of the current user with get_jwt_identity
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
-
-        if not user:
-            return jsonify({"message": "User not found"}), 404
-
-        return jsonify({
-            "message": f"Hello, {user.email}! This is a protected route.",
-            "user_id": current_user_id
-        }), 200
-
-    except Exception as e:
-        return jsonify({"message": f"Server error: {str(e)}"}), 500
-
-# @api.route('/books', methods=['POST'])
-# @jwt_required()
-# def create_book():
-    try:
-        data = request.get_json()
-        required_fields = ['title', 'author_id', 'created_date']
-
-        if not all(field in data for field in required_fields):
-            return jsonify({"message": f"Missing fields. Required: {required_fields}"}), 400
-
-        # Verifica que el autor exista
-        author = Author.query.get(data['author_id'])
-        if not author:
-            return jsonify({"message": "Author not found"}), 404
-
-        # Crea el libro
-        new_book = Book(
-            title=data['title'],
-            author_id=data['author_id'],
-            created_date=data['created_date'],
-            isbn=data.get('isbn'),
-            summary=data.get('summary'),
-            cover_image_type=data.get('cover_image_type', 'image/jpeg')
-        )
-
-        # Agrega categorías si vienen en la petición
-        category_ids = data.get('category_ids', [])
-        if category_ids:
-            categories = Category.query.filter(Category.id.in_(category_ids)).all()
-            if not categories or len(categories) != len(category_ids):
-                return jsonify({"message": "Some categories not found"}), 404
-            new_book.categories = categories
-
-        db.session.add(new_book)
-        db.session.commit()
-
-        return jsonify(new_book.serialize()), 201
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"message": f"Server error: {str(e)}"}), 500
+#  --------------------------------------------- REVIEWS ---------------------------------------------------------------------
