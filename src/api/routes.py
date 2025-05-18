@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
-from api.models import db, User, Book
+from api.models import Review, db, User, Book
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
@@ -212,7 +212,6 @@ def delete_book(book_id):
         }), 500
 
 #  --------------------------------------------- USER ---------------------------------------------------------------------
-
 @api.route('/user', methods=['GET'])
 @jwt_required()
 def get_user():
@@ -266,3 +265,86 @@ def update_user(user_id):
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- REVIEWS ---------------------------------------------------------------------
+@api.route('/books/<int:book_id>/reviews', methods=['GET'])
+def get_book_reviews(book_id):
+    try:
+        reviews = Review.query.filter_by(book_id=book_id).all()
+        return jsonify([review.serialize() for review in reviews]), 200
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+@api.route('/reviews', methods=['POST'])
+@jwt_required()
+def create_review():
+    try:
+        data = request.get_json()
+        required_fields = ['book_id', 'review_text']
+        
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": "Faltan campos requeridos"}), 400
+            
+        book = Book.query.get(data['book_id'])
+        if not book:
+            return jsonify({"message": "Libro no encontrado"}), 404
+
+        new_review = Review(
+            user_id=get_jwt_identity(),
+            book_id=data['book_id'],
+            review_text=data['review_text']
+        )
+        
+        db.session.add(new_review)
+        db.session.commit()
+        
+        return jsonify(new_review.serialize()), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+@api.route('/reviews/<int:review_id>', methods=['PUT'])
+@jwt_required()
+def update_review(review_id):
+    try:
+        review = Review.query.get(review_id)
+        current_user_id = get_jwt_identity()
+        
+        if not review:
+            return jsonify({"message": "Reseña no encontrada"}), 404
+            
+        if review.user_id != current_user_id:
+            return jsonify({"message": "No autorizado"}), 403
+
+        data = request.get_json()
+        if 'review_text' in data:
+            review.review_text = data['review_text']
+        
+        db.session.commit()
+        return jsonify(review.serialize()), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+@api.route('/reviews/<int:review_id>', methods=['DELETE'])
+@jwt_required()
+def delete_review(review_id):
+    try:
+        review = Review.query.get(review_id)
+        current_user_id = get_jwt_identity()
+        
+        if not review:
+            return jsonify({"message": "Reseña no encontrada"}), 404
+            
+        if review.user_id != current_user_id:
+            return jsonify({"message": "No autorizado"}), 403
+
+        db.session.delete(review)
+        db.session.commit()
+        return jsonify({"message": "Reseña eliminada"}), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+        
