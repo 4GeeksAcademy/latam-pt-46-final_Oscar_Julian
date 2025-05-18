@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
-from api.models import Review, db, User, Book
+from api.models import Favorite, Review, db, User, Book
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
@@ -347,4 +347,40 @@ def delete_review(review_id):
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
+#  --------------------------------------------- FAVORITES ---------------------------------------------------------------------
+@api.route('/favorites', methods=['POST'])
+@jwt_required()
+def add_favorite():
+    try:
+        data = request.get_json()
+        book_id = data.get('book_id')
         
+        if not book_id:
+            return jsonify({"message": "book_id es requerido"}), 400
+            
+        book = Book.query.get(book_id)
+        if not book:
+            return jsonify({"message": "Libro no encontrado"}), 404
+
+        # Verificar si ya existe el favorito
+        existing_fav = Favorite.query.filter_by(
+            user_id=get_jwt_identity(),
+            book_id=book_id
+        ).first()
+        
+        if existing_fav:
+            return jsonify({"message": "El libro ya está en favoritos"}), 400
+
+        new_favorite = Favorite(
+            user_id=get_jwt_identity(),
+            book_id=book_id
+        )
+        
+        db.session.add(new_favorite)
+        db.session.commit()
+        
+        return jsonify(new_favorite.serialize()), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
