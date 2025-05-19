@@ -88,6 +88,19 @@ def login():
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
 #  --------------------------------------------- BOOKS ---------------------------------------------------------------------
+
+@api.route('/books/<int:book_id>', methods=['GET'])
+def get_single_book(book_id):
+    try:
+        book = Book.query.get(book_id)
+        if not book:
+            return jsonify({"message": "Libro no encontrado"}), 404
+            
+        return jsonify(book.serialize()), 200
+        
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
 @api.route('/books', methods=['GET'])
 def get_all_books():
     try:
@@ -212,6 +225,20 @@ def delete_book(book_id):
         }), 500
 
 #  --------------------------------------------- USER ---------------------------------------------------------------------
+
+@api.route('/users/<int:user_id>', methods=['GET'])
+@jwt_required()
+def get_single_user(user_id):
+    try:
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"message": "Usuario no encontrado"}), 404
+            
+        return jsonify(user.serialize()), 200
+        
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
 @api.route('/user', methods=['GET'])
 @jwt_required()
 def get_user():
@@ -265,6 +292,19 @@ def update_user(user_id):
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- REVIEWS ---------------------------------------------------------------------
+
+@api.route('/reviews/<int:review_id>', methods=['GET'])
+def get_single_review(review_id):
+    try:
+        review = Review.query.get(review_id)
+        if not review:
+            return jsonify({"message": "Reseña no encontrada"}), 404
+            
+        return jsonify(review.serialize()), 200
+        
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
 @api.route('/books/<int:book_id>/reviews', methods=['GET'])
 def get_book_reviews(book_id):
     try:
@@ -348,6 +388,22 @@ def delete_review(review_id):
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- FAVORITES ---------------------------------------------------------------------
+
+@api.route('/favorites/<int:favorite_id>', methods=['GET'])
+@jwt_required()
+def get_single_favorite(favorite_id):
+    try:
+        favorite = Favorite.query.get(favorite_id)
+        if not favorite:
+            return jsonify({"message": "Favorito no encontrado"}), 404
+            
+        if favorite.user_id != get_jwt_identity():
+            return jsonify({"message": "No autorizado"}), 403
+            
+        return jsonify(favorite.serialize()), 200
+        
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
 
 @api.route('/favorites', methods=['GET'])
 @jwt_required()
