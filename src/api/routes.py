@@ -348,6 +348,33 @@ def delete_review(review_id):
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- FAVORITES ---------------------------------------------------------------------
+
+@api.route('/favorites', methods=['GET'])
+@jwt_required()
+def get_favorites():
+    try:
+        current_user_id = get_jwt_identity()
+        
+        favorites = Favorite.query.filter_by(user_id=current_user_id).all()
+        
+        serialized_favorites = []
+        for fav in favorites:
+            favorite_data = fav.serialize()
+            favorite_data['book'] = fav.book.serialize() if fav.book else None
+            serialized_favorites.append(favorite_data)
+        
+        return jsonify({
+            "success": True,
+            "count": len(serialized_favorites),
+            "favorites": serialized_favorites
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error al obtener favoritos: {str(e)}"
+        }), 500
+
 @api.route('/favorites', methods=['POST'])
 @jwt_required()
 def add_favorite():
@@ -384,3 +411,25 @@ def add_favorite():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
+    
+@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+@jwt_required()
+def remove_favorite(favorite_id):
+    try:
+        favorite = Favorite.query.get(favorite_id)
+        
+        if not favorite:
+            return jsonify({"message": "Favorito no encontrado"}), 404
+            
+        if favorite.user_id != get_jwt_identity():
+            return jsonify({"message": "No autorizado"}), 403
+
+        db.session.delete(favorite)
+        db.session.commit()
+        
+        return jsonify({"message": "Favorito eliminado"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+

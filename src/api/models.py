@@ -92,6 +92,7 @@ class Favorite(db.Model):
         ForeignKey("users.id", ondelete="CASCADE"))
     book_id: Mapped[Optional[int]] = mapped_column(
         ForeignKey("books.id", ondelete="CASCADE"))
+    
     user: Mapped[Optional["User"]] = relationship(back_populates="favorites")
     book: Mapped[Optional["Book"]] = relationship(back_populates="favorites")
 
