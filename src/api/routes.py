@@ -1,9 +1,9 @@
-from datetime import datetime  # Change the import
+from datetime import datetime
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
-from api.models import Favorite, Review, db, User, Book
+from api.models import db, User, ExploreBook, PersonalBook, Favorite, Review
 from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
@@ -12,6 +12,8 @@ api = Blueprint('api', __name__)
 CORS(api)
 
 #  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------
+
+
 @api.route('/signup', methods=['POST'])
 def signup():
     try:
@@ -51,6 +53,7 @@ def signup():
         # Catch any unexpected errors and return a proper JSON response
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+
 @api.route('/login', methods=['POST'])
 def login():
     try:
@@ -87,29 +90,18 @@ def login():
         # Catch any unexpected errors
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
-#  --------------------------------------------- BOOKS ---------------------------------------------------------------------
+#  --------------------------------------------- EXPLORE BOOKS ---------------------------------------------------------------------
 
-@api.route('/books/<int:book_id>', methods=['GET'])
-def get_single_book(book_id):
-    try:
-        book = Book.query.get(book_id)
-        if not book:
-            return jsonify({"message": "Libro no encontrado"}), 404
-            
-        return jsonify(book.serialize()), 200
-        
-    except Exception as e:
-        return jsonify({"message": f"Error: {str(e)}"}), 500
 
-@api.route('/books', methods=['GET'])
-def get_all_books():
+@api.route('/explore-books', methods=['GET'])
+def get_all_explore_books():
     try:
-        # Obtener todos los libros de la base de datos
-        books = Book.query.all()
-        
-        # Serializar los resultados
+        # Get all explore books from database
+        books = ExploreBook.query.all()
+
+        # Serialize the results
         serialized_books = [book.serialize() for book in books]
-        
+
         return jsonify({
             "success": True,
             "count": len(serialized_books),
@@ -119,112 +111,208 @@ def get_all_books():
     except Exception as e:
         return jsonify({
             "success": False,
-            "message": f"Error al obtener libros: {str(e)}"
+            "message": f"Error retrieving explore books: {str(e)}"
         }), 500
 
-@api.route('/books', methods=['POST'])
+
+@api.route('/explore-books/<int:book_id>', methods=['GET'])
+def get_single_explore_book(book_id):
+    try:
+        book = ExploreBook.query.get(book_id)
+        if not book:
+            return jsonify({"message": "Explore book not found"}), 404
+
+        return jsonify(book.serialize()), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+
+@api.route('/explore-books', methods=['POST'])
 @jwt_required()
-def create_book():
+def create_explore_book():
     try:
         data = request.get_json()
 
         if not data:
             return jsonify({"message": "No data provided"}), 400
 
-        required_fields = ['title', 'author', 'created_date']
+        required_fields = ['title', 'author_name']
         if not all(field in data for field in required_fields):
             return jsonify({"message": f"Missing required fields: {required_fields}"}), 400
 
         current_user_id = get_jwt_identity()
 
-        # Crear nuevo libro
-        new_book = Book(
+        # Create new explore book
+        new_book = ExploreBook(
             title=data['title'],
-            author=data['author'],
+            author_name=data['author_name'],
             genre=data.get('genre'),
             category=data.get('category'),
+            summary=data.get('summary'),
             cover_image=data.get('cover_image'),
-            created_date=datetime.strptime(data['created_date'], "%Y-%m-%d").date(),
-            user_id=current_user_id
+            created_by=current_user_id
         )
 
         db.session.add(new_book)
         db.session.commit()
 
-        return jsonify({"message": "Book created successfully", "book": new_book.serialize()}), 201
+        return jsonify({"message": "Explore book created successfully", "book": new_book.serialize()}), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
-@api.route('/books/<int:book_id>', methods=['PUT'])
+#  --------------------------------------------- PERSONAL BOOKS ---------------------------------------------------------------------
+
+
+@api.route('/personal-books', methods=['GET'])
 @jwt_required()
-def update_book(book_id):
+def get_all_personal_books():
+    try:
+        # Get all personal books from database
+        books = PersonalBook.query.all()
+
+        # Serialize the results
+        serialized_books = [book.serialize() for book in books]
+
+        return jsonify({
+            "success": True,
+            "count": len(serialized_books),
+            "data": serialized_books
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error retrieving personal books: {str(e)}"
+        }), 500
+
+
+@api.route('/personal-books/<int:book_id>', methods=['GET'])
+def get_single_personal_book(book_id):
+    try:
+        book = PersonalBook.query.get(book_id)
+        if not book:
+            return jsonify({"message": "Personal book not found"}), 404
+
+        return jsonify(book.serialize()), 200
+
+    except Exception as e:
+        return jsonify({"message": f"Error: {str(e)}"}), 500
+
+
+@api.route('/personal-books', methods=['POST'])
+@jwt_required()
+def create_personal_book():
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({"message": "No data provided"}), 400
+
+        required_fields = ['title', 'author_name']
+        if not all(field in data for field in required_fields):
+            return jsonify({"message": f"Missing required fields: {required_fields}"}), 400
+
+        current_user_id = get_jwt_identity()
+
+        # Create new personal book
+        new_book = PersonalBook(
+            title=data['title'],
+            author_name=data['author_name'],
+            genre=data.get('genre'),
+            category=data.get('category'),
+            summary=data.get('summary'),
+            cover_image=data.get('cover_image'),
+            created_by=current_user_id
+        )
+
+        db.session.add(new_book)
+        db.session.commit()
+
+        return jsonify({"message": "Personal book created successfully", "book": new_book.serialize()}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Server error: {str(e)}"}), 500
+
+
+@api.route('/personal-books/<int:book_id>', methods=['PUT'])
+@jwt_required()
+def update_personal_book(book_id):
     try:
         current_user_id = get_jwt_identity()
-        book = Book.query.get(book_id)
+        book = PersonalBook.query.get(book_id)
 
-        # Validar existencia del libro
+        # Validate book exists
         if not book:
-            return jsonify({"message": "Book not found"}), 404
+            return jsonify({"message": "Personal book not found"}), 404
+
+        # Check if user is the owner of the book
+        if str(book.created_by) != current_user_id:
+            return jsonify({"message": "Unauthorized - You can only update your own books"}), 403
 
         data = request.get_json()
-        
-        # Actualizar campos permitidos
+
+        # Update allowed fields
         if 'title' in data:
             book.title = data['title']
-        if 'author' in data:
-            book.author = data['author']
+        if 'author_name' in data:
+            book.author_name = data['author_name']
         if 'genre' in data:
             book.genre = data['genre']
         if 'category' in data:
             book.category = data['category']
+        if 'summary' in data:
+            book.summary = data['summary']
         if 'cover_image' in data:
             book.cover_image = data['cover_image']
-        if 'created_date' in data:
-            book.created_date = datetime.strptime(data['created_date'], "%Y-%m-%d").date()
 
         db.session.commit()
-        
+
         return jsonify({
-            "message": "Book updated successfully",
+            "message": "Personal book updated successfully",
             "book": book.serialize()
         }), 200
 
-    except ValueError as e:
-        db.session.rollback()
-        return jsonify({"message": f"Invalid date format: {str(e)}"}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
-@api.route('/books/<int:book_id>', methods=['DELETE'])
+
+@api.route('/personal-books/<int:book_id>', methods=['DELETE'])
 @jwt_required()
-def delete_book(book_id):
+def delete_personal_book(book_id):
     try:
         current_user_id = get_jwt_identity()
-        book = Book.query.get(book_id)
+        book = PersonalBook.query.get(book_id)
 
-        # Validar existencia del libro
+        # Validate book exists
         if not book:
-            return jsonify({"message": "Libro no encontrado"}), 404
+            return jsonify({"message": "Personal book not found"}), 404
 
-        # Eliminar el libro
+        # Check if user is the owner of the book
+        if str(book.created_by) != current_user_id:
+            return jsonify({"message": "Unauthorized - You can only delete your own books"}), 403
+
+        # Delete the book
         db.session.delete(book)
         db.session.commit()
-        
+
         return jsonify({
-            "message": "Libro eliminado exitosamente",
+            "message": "Personal book deleted successfully",
             "deleted_book_id": book_id
         }), 200
 
     except Exception as e:
         db.session.rollback()
         return jsonify({
-            "message": f"Error en el servidor: {str(e)}"
+            "message": f"Server error: {str(e)}"
         }), 500
 
 #  --------------------------------------------- USER ---------------------------------------------------------------------
+
 
 @api.route('/users/<int:user_id>', methods=['GET'])
 @jwt_required()
@@ -232,12 +320,13 @@ def get_single_user(user_id):
     try:
         user = User.query.get(user_id)
         if not user:
-            return jsonify({"message": "Usuario no encontrado"}), 404
-            
+            return jsonify({"message": "User not found"}), 404
+
         return jsonify(user.serialize()), 200
-        
+
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 @api.route('/user', methods=['GET'])
 @jwt_required()
@@ -255,15 +344,16 @@ def get_user():
     except Exception as e:
         return jsonify({"message": f"Server error: {str(e)}"}), 500
 
+
 @api.route('/users', methods=['GET'])
 @jwt_required()
 def get_all_users():
     try:
-        # Solo accesible para administradores
         users = User.query.all()
         return jsonify([user.serialize() for user in users]), 200
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 @api.route('/users/<int:user_id>', methods=['PUT'])
 @jwt_required()
@@ -271,47 +361,54 @@ def update_user(user_id):
     try:
         current_user_id = get_jwt_identity()
         user = User.query.get(user_id)
-        
+
         if not user:
-            return jsonify({"message": "Usuario no encontrado"}), 404
-            
-        if user.id != current_user_id:
-            return jsonify({"message": "No autorizado"}), 403
+            return jsonify({"message": "User not found"}), 404
+
+        if str(user.id) != current_user_id:
+            return jsonify({"message": "Unauthorized"}), 403
 
         data = request.get_json()
         if 'email' in data:
             user.email = data['email'].lower()
         if 'password' in data:
             user.password = generate_password_hash(data['password'])
-        
+
         db.session.commit()
         return jsonify(user.serialize()), 200
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- REVIEWS ---------------------------------------------------------------------
 
+
 @api.route('/reviews/<int:review_id>', methods=['GET'])
 def get_single_review(review_id):
     try:
         review = Review.query.get(review_id)
         if not review:
-            return jsonify({"message": "Reseña no encontrada"}), 404
-            
+            return jsonify({"message": "Review not found"}), 404
+
         return jsonify(review.serialize()), 200
-        
+
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
-@api.route('/books/<int:book_id>/reviews', methods=['GET'])
+
+@api.route('/personal-books/<int:book_id>/reviews', methods=['GET'])
 def get_book_reviews(book_id):
     try:
+        book = PersonalBook.query.get(book_id)
+        if not book:
+            return jsonify({"message": "Personal book not found"}), 404
+
         reviews = Review.query.filter_by(book_id=book_id).all()
         return jsonify([review.serialize() for review in reviews]), 200
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 @api.route('/reviews', methods=['POST'])
 @jwt_required()
@@ -319,28 +416,45 @@ def create_review():
     try:
         data = request.get_json()
         required_fields = ['book_id', 'review_text']
-        
+
         if not all(field in data for field in required_fields):
-            return jsonify({"message": "Faltan campos requeridos"}), 400
-            
-        book = Book.query.get(data['book_id'])
+            return jsonify({"message": "Missing required fields"}), 400
+
+        book = PersonalBook.query.get(data['book_id'])
         if not book:
-            return jsonify({"message": "Libro no encontrado"}), 404
+            return jsonify({"message": "Personal book not found"}), 404
+
+        current_user_id = get_jwt_identity()
+
+        # Check if this is the user's own book
+        if str(book.created_by) == current_user_id:
+            return jsonify({"message": "You cannot review your own book"}), 400
+
+        # Check if the user already has a review for this book
+        existing_review = Review.query.filter_by(
+            user_id=current_user_id,
+            book_id=data['book_id']
+        ).first()
+
+        if existing_review:
+            return jsonify({"message": "You already have a review for this book"}), 400
 
         new_review = Review(
-            user_id=get_jwt_identity(),
+            user_id=current_user_id,
             book_id=data['book_id'],
-            review_text=data['review_text']
+            review_text=data['review_text'],
+            rating=data.get('rating')
         )
-        
+
         db.session.add(new_review)
         db.session.commit()
-        
+
         return jsonify(new_review.serialize()), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 @api.route('/reviews/<int:review_id>', methods=['PUT'])
 @jwt_required()
@@ -348,23 +462,26 @@ def update_review(review_id):
     try:
         review = Review.query.get(review_id)
         current_user_id = get_jwt_identity()
-        
+
         if not review:
-            return jsonify({"message": "Reseña no encontrada"}), 404
-            
-        if review.user_id != current_user_id:
-            return jsonify({"message": "No autorizado"}), 403
+            return jsonify({"message": "Review not found"}), 404
+
+        if str(review.user_id) != current_user_id:
+            return jsonify({"message": "Unauthorized"}), 403
 
         data = request.get_json()
         if 'review_text' in data:
             review.review_text = data['review_text']
-        
+        if 'rating' in data:
+            review.rating = data['rating']
+
         db.session.commit()
         return jsonify(review.serialize()), 200
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 @api.route('/reviews/<int:review_id>', methods=['DELETE'])
 @jwt_required()
@@ -372,22 +489,23 @@ def delete_review(review_id):
     try:
         review = Review.query.get(review_id)
         current_user_id = get_jwt_identity()
-        
+
         if not review:
-            return jsonify({"message": "Reseña no encontrada"}), 404
-            
-        if review.user_id != current_user_id:
-            return jsonify({"message": "No autorizado"}), 403
+            return jsonify({"message": "Review not found"}), 404
+
+        if str(review.user_id) != current_user_id:
+            return jsonify({"message": "Unauthorized"}), 403
 
         db.session.delete(review)
         db.session.commit()
-        return jsonify({"message": "Reseña eliminada"}), 200
-        
+        return jsonify({"message": "Review deleted"}), 200
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- FAVORITES ---------------------------------------------------------------------
+
 
 @api.route('/favorites/<int:favorite_id>', methods=['GET'])
 @jwt_required()
@@ -395,30 +513,41 @@ def get_single_favorite(favorite_id):
     try:
         favorite = Favorite.query.get(favorite_id)
         if not favorite:
-            return jsonify({"message": "Favorito no encontrado"}), 404
-            
-        if favorite.user_id != get_jwt_identity():
-            return jsonify({"message": "No autorizado"}), 403
-            
+            return jsonify({"message": "Favorite not found"}), 404
+
+        current_user_id = get_jwt_identity()
+        if str(favorite.user_id) != current_user_id:
+            return jsonify({"message": "Unauthorized"}), 403
+
         return jsonify(favorite.serialize()), 200
-        
+
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 @api.route('/favorites', methods=['GET'])
 @jwt_required()
 def get_favorites():
     try:
         current_user_id = get_jwt_identity()
-        
+
         favorites = Favorite.query.filter_by(user_id=current_user_id).all()
-        
+
         serialized_favorites = []
         for fav in favorites:
             favorite_data = fav.serialize()
-            favorite_data['book'] = fav.book.serialize() if fav.book else None
+            # Add book data based on type (explore or personal)
+            if fav.explore_book_id:
+                favorite_data['book'] = fav.explore_book.serialize(
+                ) if fav.explore_book else None
+                favorite_data['book_type'] = 'explore'
+            elif fav.personal_book_id:
+                favorite_data['book'] = fav.personal_book.serialize(
+                ) if fav.personal_book else None
+                favorite_data['book_type'] = 'personal'
+
             serialized_favorites.append(favorite_data)
-        
+
         return jsonify({
             "success": True,
             "count": len(serialized_favorites),
@@ -428,64 +557,110 @@ def get_favorites():
     except Exception as e:
         return jsonify({
             "success": False,
-            "message": f"Error al obtener favoritos: {str(e)}"
+            "message": f"Error retrieving favorites: {str(e)}"
         }), 500
 
-@api.route('/favorites', methods=['POST'])
+
+@api.route('/favorites/explore', methods=['POST'])
 @jwt_required()
-def add_favorite():
+def add_explore_favorite():
     try:
         data = request.get_json()
-        book_id = data.get('book_id')
-        
-        if not book_id:
-            return jsonify({"message": "book_id es requerido"}), 400
-            
-        book = Book.query.get(book_id)
-        if not book:
-            return jsonify({"message": "Libro no encontrado"}), 404
+        explore_book_id = data.get('explore_book_id')
 
-        # Verificar si ya existe el favorito
+        if not explore_book_id:
+            return jsonify({"message": "explore_book_id is required"}), 400
+
+        book = ExploreBook.query.get(explore_book_id)
+        if not book:
+            return jsonify({"message": "Explore book not found"}), 404
+
+        current_user_id = get_jwt_identity()
+
+        # Check if favorite already exists
         existing_fav = Favorite.query.filter_by(
-            user_id=get_jwt_identity(),
-            book_id=book_id
+            user_id=current_user_id,
+            explore_book_id=explore_book_id
         ).first()
-        
+
         if existing_fav:
-            return jsonify({"message": "El libro ya está en favoritos"}), 400
+            return jsonify({"message": "This book is already in your favorites"}), 400
 
         new_favorite = Favorite(
-            user_id=get_jwt_identity(),
-            book_id=book_id
+            user_id=current_user_id,
+            explore_book_id=explore_book_id,
+            personal_book_id=None
         )
-        
+
         db.session.add(new_favorite)
         db.session.commit()
-        
+
         return jsonify(new_favorite.serialize()), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
-    
-@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
-@jwt_required()
-def remove_favorite(favorite_id):
-    try:
-        favorite = Favorite.query.get(favorite_id)
-        
-        if not favorite:
-            return jsonify({"message": "Favorito no encontrado"}), 404
-            
-        if favorite.user_id != get_jwt_identity():
-            return jsonify({"message": "No autorizado"}), 403
 
-        db.session.delete(favorite)
+
+@api.route('/favorites/personal', methods=['POST'])
+@jwt_required()
+def add_personal_favorite():
+    try:
+        data = request.get_json()
+        personal_book_id = data.get('personal_book_id')
+
+        if not personal_book_id:
+            return jsonify({"message": "personal_book_id is required"}), 400
+
+        book = PersonalBook.query.get(personal_book_id)
+        if not book:
+            return jsonify({"message": "Personal book not found"}), 404
+
+        current_user_id = get_jwt_identity()
+
+        # Check if favorite already exists
+        existing_fav = Favorite.query.filter_by(
+            user_id=current_user_id,
+            personal_book_id=personal_book_id
+        ).first()
+
+        if existing_fav:
+            return jsonify({"message": "This book is already in your favorites"}), 400
+
+        new_favorite = Favorite(
+            user_id=current_user_id,
+            explore_book_id=None,
+            personal_book_id=personal_book_id
+        )
+
+        db.session.add(new_favorite)
         db.session.commit()
-        
-        return jsonify({"message": "Favorito eliminado"}), 200
+
+        return jsonify(new_favorite.serialize()), 201
 
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
+
+@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+@jwt_required()
+def remove_favorite(favorite_id):
+    try:
+        favorite = Favorite.query.get(favorite_id)
+        current_user_id = get_jwt_identity()
+
+        if not favorite:
+            return jsonify({"message": "Favorite not found"}), 404
+
+        if str(favorite.user_id) != current_user_id:
+            return jsonify({"message": "Unauthorized"}), 403
+
+        db.session.delete(favorite)
+        db.session.commit()
+
+        return jsonify({"message": "Favorite removed successfully"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
