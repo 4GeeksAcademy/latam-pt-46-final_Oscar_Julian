@@ -81,13 +81,17 @@ export const Navbar = () => {
 					) : (
 						<>
 							<Link to="/welcome" className="btn btn-outline-light home-btn">
+								<i class="fa-solid fa-magnifying-glass-plus"></i>
+								<span className="text-span">Explorar</span>
+							</Link>
+							<Link to="/library" className="btn btn-outline-light home-btn">
 								<i className="fa-solid fa-book me-1"></i>
 								<span className="text-span">Mi Biblioteca</span>
 							</Link>
 						</>
 					)}
 				</div>
-				<div className="btn-group shadow-0 w-auto" role="group" aria-label="User Actions">
+				<div className="btn-group shadow-0 w-auto ms-2" role="group" aria-label="User Actions">
 					{!store.isAuthenticated ? (
 						<>
 							<Link to="/login" className="btn btn-outline-light login-btn">

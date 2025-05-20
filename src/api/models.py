@@ -125,4 +125,4 @@ class Review(db.Model):
             "review_text": self.review_text,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
-
+    
