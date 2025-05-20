@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
 import { BookCard } from "../component/BookCard";
@@ -93,10 +93,6 @@ export const Welcome = () => {
                         <div className="stat-item">
                             <i className="fa-solid fa-book"></i>
                             <span>Total: {store.totalBooks} libros</span>
-                        </div>
-                        <div className="stat-item">
-                            <i className="fa-solid fa-filter"></i>
-                            <span>Mostrando: {store.booksPerPage} por página</span>
                         </div>
                         <div className="stat-item">
                             <i className="fa-solid fa-bookmark"></i>

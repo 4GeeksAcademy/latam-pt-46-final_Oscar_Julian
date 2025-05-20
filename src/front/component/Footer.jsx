@@ -1,4 +1,9 @@
+import { Link } from "react-router-dom";
+import { useGlobalReducer } from "../store/globalReducer";
+
 export const Footer = () => {
+	const { store, actions } = useGlobalReducer();
+
 	return (
 		<footer className="text-white py-4">
 			<div className="container">
@@ -10,9 +15,25 @@ export const Footer = () => {
 					<div className="col-md-3">
 						<h5>Enlaces</h5>
 						<ul className="list-unstyled">
-							<li><a href="#" className="text-white">Inicio</a></li>
-							<li><a href="#" className="text-white">Características</a></li>
-							<li><a href="#" className="text-white">Contacto</a></li>
+							{!store.isAuthenticated ? (
+								<>
+									<li><a href="#" className="text-white">Inicio</a></li>
+									<li><a href="#" className="text-white">Características</a></li>
+									<li><a href="#" className="text-white">Contacto</a></li>
+								</>
+							) : (
+								<>
+									<Link to="/" className="btn btn-outline-light home-btn">
+										<li><a href="" className="text-white">Inicio</a></li>
+									</Link>
+									<Link to="/" className="btn btn-outline-light home-btn">
+										<li><a href="#" className="text-white">Características</a></li>
+									</Link>
+									<Link to="/" className="btn btn-outline-light home-btn">
+										<li><a href="#" className="text-white">Contacto</a></li>
+									</Link>
+								</>
+							)}
 						</ul>
 					</div>
 					<div className="col-md-3">
