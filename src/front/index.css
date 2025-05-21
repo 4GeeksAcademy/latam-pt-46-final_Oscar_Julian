@@ -786,3 +786,193 @@ a:hover {
     transform: translateY(0);
   }
 }
+
+/* ====== ESTILOS ADICIONALES PARA REVIEWS ====== */
+
+/* Estilos para el botón de review en los libros de otros usuarios */
+.book-actions .btn-outline-success {
+  color: #28a745;
+  border-color: #28a745;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.book-actions .btn-outline-success:hover {
+  background-color: #28a745;
+  border-color: #28a745;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Estilos para el botón de ver reviews */
+.book-actions .btn-outline-info {
+  color: #17a2b8;
+  border-color: #17a2b8;
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.book-actions .btn-outline-info:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Estilos para las reviews dentro del modal */
+.reviews-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.review-item {
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.review-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+.review-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0;
+}
+
+.review-header strong {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.review-rating {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.review-rating .text-warning {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.review-text p {
+  color: #555;
+  line-height: 1.5;
+  margin-top: 10px;
+}
+
+/* Animaciones para los modales de reviews */
+.modal.show .modal-dialog {
+  animation: reviewModalSlideIn 0.3s ease forwards;
+}
+
+@keyframes reviewModalSlideIn {
+  from {
+    transform: translateY(-30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Estilos para el formulario de crear review */
+.modal-header.bg-success {
+  background-color: #28a745 !important;
+  border-bottom: 2px solid #218838;
+}
+
+.modal-header.bg-info {
+  background-color: #17a2b8 !important;
+  border-bottom: 2px solid #138496;
+}
+
+/* Estilos para el textarea de review */
+#review_text {
+  resize: vertical;
+  min-height: 120px;
+  font-family: inherit;
+}
+
+#review_text:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+}
+
+/* Estilos para el select de rating */
+.form-select:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+}
+
+/* Indicador de que no hay reviews */
+.fa-comment-slash {
+  opacity: 0.3;
+}
+
+/* Animación de aparición para cada review */
+.review-item {
+  animation: reviewItemAppear 0.3s ease forwards;
+}
+
+@keyframes reviewItemAppear {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Delay progresivo para las reviews */
+.review-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.review-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.review-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+.review-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
+.review-item:nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+/* Estilo para el contador de reviews en el footer del modal */
+.modal-footer .text-muted small {
+  font-size: 0.85rem;
+}
+
+/* Estilos responsivos para reviews */
+@media (max-width: 767.98px) {
+  .book-actions {
+    gap: 3px;
+  }
+
+  .book-actions .btn {
+    min-width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .reviews-list {
+    max-height: 300px;
+  }
+
+  .review-item {
+    padding: 10px;
+  }
+
+  .modal-dialog.modal-lg {
+    max-width: calc(100% - 20px);
+    margin: 10px;
+  }
+}

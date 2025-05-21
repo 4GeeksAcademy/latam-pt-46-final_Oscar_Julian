@@ -30,6 +30,9 @@ const initialState = {
     seedingProgress: 0,
     otherUsersBooks: [],
     totalOtherUsersBooks: 0,
+    // Estados para reviews
+    reviews: [],
+    currentBookReviews: [],
 };
 
 // Tipos de acciones
@@ -63,6 +66,13 @@ export const ACTIONS = {
 
     SET_OTHER_USERS_BOOKS: 'set_other_users_books',
     SET_TOTAL_OTHER_USERS_BOOKS: 'set_total_other_users_books',
+
+    // Acciones para reviews
+    SET_REVIEWS: 'set_reviews',
+    SET_CURRENT_BOOK_REVIEWS: 'set_current_book_reviews',
+    ADD_REVIEW: 'add_review',
+    UPDATE_REVIEW: 'update_review',
+    REMOVE_REVIEW: 'remove_review',
 };
 
 // Reducer para manejar las acciones
@@ -137,6 +147,34 @@ function reducer(state, action) {
             return { ...state, otherUsersBooks: action.payload };
         case ACTIONS.SET_TOTAL_OTHER_USERS_BOOKS:
             return { ...state, totalOtherUsersBooks: action.payload };
+
+        // Cases para reviews
+        case ACTIONS.SET_REVIEWS:
+            return { ...state, reviews: action.payload };
+        case ACTIONS.SET_CURRENT_BOOK_REVIEWS:
+            return { ...state, currentBookReviews: action.payload };
+        case ACTIONS.ADD_REVIEW:
+            return {
+                ...state,
+                reviews: [...state.reviews, action.payload],
+                currentBookReviews: [...state.currentBookReviews, action.payload]
+            };
+        case ACTIONS.UPDATE_REVIEW:
+            return {
+                ...state,
+                reviews: state.reviews.map(review =>
+                    review.id === action.payload.id ? action.payload : review
+                ),
+                currentBookReviews: state.currentBookReviews.map(review =>
+                    review.id === action.payload.id ? action.payload : review
+                )
+            };
+        case ACTIONS.REMOVE_REVIEW:
+            return {
+                ...state,
+                reviews: state.reviews.filter(review => review.id !== action.payload),
+                currentBookReviews: state.currentBookReviews.filter(review => review.id !== action.payload)
+            };
 
         // Siembra de Libros
         case ACTIONS.SEED_BOOKS:
@@ -745,6 +783,166 @@ export const GlobalProvider = ({ children }) => {
             } finally {
                 dispatch({ type: ACTIONS.SEED_BOOKS, payload: false });
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+            }
+        },
+
+        // ====== FUNCIONES PARA REVIEWS ======
+
+        // Obtener reviews de un libro específico
+        getBookReviews: async (bookId) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/personal-books/${bookId}/reviews`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching reviews');
+                }
+
+                const reviews = await response.json();
+                dispatch({ type: ACTIONS.SET_CURRENT_BOOK_REVIEWS, payload: reviews });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return reviews;
+            } catch (error) {
+                console.error("Error fetching book reviews:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Error al cargar las reviews. Por favor, intenta más tarde."
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return [];
+            }
+        },
+
+        // Crear una nueva review
+        createReview: async (reviewData) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/reviews`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(reviewData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Error creating review");
+                }
+
+                const newReview = await response.json();
+                dispatch({ type: ACTIONS.ADD_REVIEW, payload: newReview });
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Review creada exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                console.error("Error creating review:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al crear la review: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
+            }
+        },
+
+        // Actualizar una review existente
+        updateReview: async (reviewId, reviewData) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/reviews/${reviewId}`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(reviewData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Error updating review");
+                }
+
+                const updatedReview = await response.json();
+                dispatch({ type: ACTIONS.UPDATE_REVIEW, payload: updatedReview });
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Review actualizada exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                console.error("Error updating review:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al actualizar la review: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
+            }
+        },
+
+        // Eliminar una review
+        deleteReview: async (reviewId) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/reviews/${reviewId}`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Error deleting review");
+                }
+
+                dispatch({ type: ACTIONS.REMOVE_REVIEW, payload: reviewId });
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Review eliminada exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                console.error("Error deleting review:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al eliminar la review: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
             }
         }
     };

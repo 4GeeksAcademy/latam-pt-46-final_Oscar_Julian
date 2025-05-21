@@ -5,6 +5,7 @@ import { Pagination } from "../component/Pagination";
 import { FilterBar } from "../component/FilterBar";
 import { MessageAlert } from "../component/MessageAlert";
 import { PersonalBookCard } from "../component/PersonalBookCard";
+import { ViewReviewsModal } from "../component/ReviewModals";
 import AWS from 'aws-sdk';
 
 export const Library = () => {
@@ -14,6 +15,7 @@ export const Library = () => {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showReviewsModal, setShowReviewsModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [bookForm, setBookForm] = useState({
         title: "",
@@ -237,6 +239,14 @@ export const Library = () => {
         }
     };
 
+    // Preparar para ver reviews
+    const prepareViewReviews = async (book) => {
+        setSelectedBook(book);
+        setShowReviewsModal(true);
+        // Cargar las reviews del libro
+        await actions.getBookReviews(book.id);
+    };
+
     // Filtrar libros localmente según los filtros aplicados
     const getFilteredBooks = () => {
         if (!store.personalBooks || store.personalBooks.length === 0) return [];
@@ -354,6 +364,7 @@ export const Library = () => {
                                         book={book}
                                         onEdit={prepareEditBook}
                                         onDelete={prepareDeleteBook}
+                                        onViewReviews={prepareViewReviews}
                                     />
                                 </div>
                             ))}
@@ -664,8 +675,21 @@ export const Library = () => {
                 </div>
             )}
 
+            {/* Modal para ver reviews */}
+            <ViewReviewsModal
+                show={showReviewsModal}
+                onClose={() => {
+                    setShowReviewsModal(false);
+                    setSelectedBook(null);
+                }}
+                book={selectedBook}
+                reviews={store.currentBookReviews}
+                isLoading={store.isLoading}
+                currentUser={store.user}
+            />
+
             {/* Overlay oscuro para los modales */}
-            {(showAddModal || showEditModal || showDeleteModal) && (
+            {(showAddModal || showEditModal || showDeleteModal || showReviewsModal) && (
                 <div className="modal-backdrop fade show"></div>
             )}
 

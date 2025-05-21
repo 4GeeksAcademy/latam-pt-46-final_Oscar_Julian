@@ -2,10 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
 import { MessageAlert } from "../component/MessageAlert";
+import { OtherUserBookCard } from "../component/OtherUserBookCard";
+import { CreateReviewModal } from "../component/ReviewModals";
 
 export const OtherBooks = () => {
     const { store, actions } = useGlobalReducer();
     const [loading, setLoading] = useState(true);
+    const [showReviewModal, setShowReviewModal] = useState(false);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [reviewForm, setReviewForm] = useState({
+        review_text: "",
+        rating: ""
+    });
 
     // Cargar libros de otros usuarios cuando el componente se monta
     useEffect(() => {
@@ -17,7 +25,57 @@ export const OtherBooks = () => {
         loadBooks();
     }, []);
 
-    // Mostrar estado de carga
+    // Resetear el formulario de review
+    const resetReviewForm = () => {
+        setReviewForm({
+            review_text: "",
+            rating: ""
+        });
+    };
+
+    // Manejar cambios en el formulario de review
+    const handleReviewInputChange = (e) => {
+        setReviewForm({
+            ...reviewForm,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    // Preparar para dejar review
+    const prepareLeaveReview = (book) => {
+        setSelectedBook(book);
+        resetReviewForm();
+        setShowReviewModal(true);
+    };
+
+    // Manejar envío de review
+    const handleSubmitReview = async (e) => {
+        e.preventDefault();
+
+        if (!reviewForm.review_text) {
+            actions.setMessage("El texto de la review es obligatorio");
+            return;
+        }
+
+        try {
+            const reviewData = {
+                book_id: selectedBook.id,
+                review_text: reviewForm.review_text,
+                rating: reviewForm.rating ? parseInt(reviewForm.rating) : null
+            };
+
+            const success = await actions.createReview(reviewData);
+            if (success) {
+                setShowReviewModal(false);
+                resetReviewForm();
+                setSelectedBook(null);
+            }
+        } catch (error) {
+            actions.setMessage("Error al enviar la review: " + error.message);
+        }
+    };
+
+    // Mostrar estado de carga inicial
     if (loading) {
         return (
             <div className="loading-indicator">
@@ -39,7 +97,7 @@ export const OtherBooks = () => {
                             Libros de Otros Usuarios
                         </h1>
                         <p className="lead text-white-50">
-                            Explora los libros compartidos por la comunidad
+                            Explora los libros compartidos por la comunidad y deja tus reviews
                         </p>
                     </div>
                     <div>
@@ -59,7 +117,7 @@ export const OtherBooks = () => {
                     </div>
                 ) : store.otherUsersBooks && store.otherUsersBooks.length > 0 ? (
                     <div className="other-users-books">
-                        {store.otherUsersBooks.map((userData, index) => (
+                        {store.otherUsersBooks.map((userData, userIndex) => (
                             <div
                                 key={userData.user_id}
                                 className="user-books-section mb-5 pb-4 border-bottom border-secondary"
@@ -70,35 +128,16 @@ export const OtherBooks = () => {
                                 </h3>
                                 {userData.books && userData.books.length > 0 ? (
                                     <div className="books-grid">
-                                        {userData.books.map((book) => (
+                                        {userData.books.map((book, bookIndex) => (
                                             <div
                                                 key={book.id}
                                                 className="book-appear"
-                                                style={{ animationDelay: `${index * 0.05}s` }}
+                                                style={{ animationDelay: `${(userIndex * userData.books.length + bookIndex) * 0.05}s` }}
                                             >
-                                                <div className="book-card">
-                                                    <div className="book-cover">
-                                                        {book.cover_image ? (
-                                                            <img
-                                                                src={book.cover_image}
-                                                                alt={`Portada de ${book.title}`}
-                                                                className="img-fluid rounded shadow"
-                                                            />
-                                                        ) : (
-                                                            <div className="no-cover-placeholder rounded shadow d-flex align-items-center justify-content-center text-center">
-                                                                <span>Sin portada disponible</span>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="book-info mt-3">
-                                                        <h5 className="book-title text-truncate">{book.title}</h5>
-                                                        <p className="book-author mb-1 text-truncate">{book.author_name}</p>
-                                                        <div className="book-meta d-flex flex-wrap gap-1 mt-2">
-                                                            {book.genre && <span className="badge bg-primary">{book.genre}</span>}
-                                                            {book.category && <span className="badge bg-secondary">{book.category}</span>}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <OtherUserBookCard
+                                                    book={book}
+                                                    onLeaveReview={prepareLeaveReview}
+                                                />
                                             </div>
                                         ))}
                                     </div>
@@ -122,6 +161,26 @@ export const OtherBooks = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal para crear review */}
+            <CreateReviewModal
+                show={showReviewModal}
+                onClose={() => {
+                    setShowReviewModal(false);
+                    setSelectedBook(null);
+                    resetReviewForm();
+                }}
+                book={selectedBook}
+                reviewForm={reviewForm}
+                onInputChange={handleReviewInputChange}
+                onSubmit={handleSubmitReview}
+                isLoading={store.isLoading}
+            />
+
+            {/* Overlay oscuro para el modal */}
+            {showReviewModal && (
+                <div className="modal-backdrop fade show"></div>
+            )}
 
             {/* Componente de mensaje */}
             <MessageAlert />

@@ -1,4 +1,6 @@
-export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews }) => {
+import React from "react";
+
+export const OtherUserBookCard = ({ book, onLeaveReview }) => {
     return (
         <div className="book-card-container">
             <div className="book-card">
@@ -25,28 +27,14 @@ export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews }) => {
                 </div>
             </div>
 
-            {/* Botones de acción */}
+            {/* Botón de acción para dejar review */}
             <div className="book-actions">
                 <button
-                    className="btn btn-sm btn-outline-info me-1"
-                    onClick={() => onViewReviews(book)}
-                    title="Ver reviews"
+                    className="btn btn-sm btn-outline-success"
+                    onClick={() => onLeaveReview(book)}
+                    title="Dejar una review"
                 >
-                    <i className="fa-solid fa-comments"></i>
-                </button>
-                <button
-                    className="btn btn-sm btn-outline-primary me-1"
-                    onClick={() => onEdit(book)}
-                    title="Editar libro"
-                >
-                    <i className="fa-solid fa-edit"></i>
-                </button>
-                <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => onDelete(book)}
-                    title="Eliminar libro"
-                >
-                    <i className="fa-solid fa-trash"></i>
+                    <i className="fa-solid fa-star"></i>
                 </button>
             </div>
         </div>
