@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 0ba49a4db1e2
-Revises: a64751183750
-Create Date: 2025-05-21 00:30:19.333837
+Revision ID: 9e3dd2320c8e
+Revises: fix_dependencies
+Create Date: 2025-05-21 00:43:06.012482
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '0ba49a4db1e2'
-down_revision = 'a64751183750'
+revision = '9e3dd2320c8e'
+down_revision = 'fix_dependencies'
 branch_labels = None
 depends_on = None
 
@@ -44,8 +44,6 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     schema='public'
     )
-    op.drop_table('books')
-    op.drop_table('api_books')
     with op.batch_alter_table('favorites', schema=None) as batch_op:
         batch_op.add_column(sa.Column('explore_book_id', sa.Integer(), nullable=True))
         batch_op.add_column(sa.Column('personal_book_id', sa.Integer(), nullable=True))
@@ -61,10 +59,9 @@ def upgrade():
         batch_op.create_unique_constraint(None, ['user_id', 'explore_book_id'])
         batch_op.create_unique_constraint(None, ['user_id', 'personal_book_id'])
         batch_op.drop_constraint('favorites_user_id_fkey', type_='foreignkey')
-        batch_op.drop_constraint('favorites_book_id_fkey', type_='foreignkey')
+        batch_op.create_foreign_key(None, 'explore_books', ['explore_book_id'], ['id'], referent_schema='public')
         batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='public')
         batch_op.create_foreign_key(None, 'personal_books', ['personal_book_id'], ['id'], referent_schema='public')
-        batch_op.create_foreign_key(None, 'explore_books', ['explore_book_id'], ['id'], referent_schema='public')
         batch_op.drop_column('book_id')
 
     with op.batch_alter_table('reviews', schema=None) as batch_op:
@@ -83,10 +80,9 @@ def upgrade():
                type_=sa.Integer(),
                nullable=False)
         batch_op.create_unique_constraint(None, ['user_id', 'book_id'])
-        batch_op.drop_constraint('reviews_book_id_fkey', type_='foreignkey')
         batch_op.drop_constraint('reviews_user_id_fkey', type_='foreignkey')
-        batch_op.create_foreign_key(None, 'personal_books', ['book_id'], ['id'], referent_schema='public')
         batch_op.create_foreign_key(None, 'users', ['user_id'], ['id'], referent_schema='public')
+        batch_op.create_foreign_key(None, 'personal_books', ['book_id'], ['id'], referent_schema='public')
         batch_op.drop_column('created_at')
 
     with op.batch_alter_table('users', schema=None) as batch_op:
@@ -94,7 +90,8 @@ def upgrade():
                existing_type=sa.BIGINT(),
                type_=sa.Integer(),
                existing_nullable=False,
-               autoincrement=True)
+               autoincrement=True,
+               existing_server_default=sa.text("nextval('users_id_seq'::regclass)"))
         batch_op.alter_column('is_active',
                existing_type=sa.BOOLEAN(),
                nullable=True)
@@ -112,14 +109,14 @@ def downgrade():
                existing_type=sa.Integer(),
                type_=sa.BIGINT(),
                existing_nullable=False,
-               autoincrement=True)
+               autoincrement=True,
+               existing_server_default=sa.text("nextval('users_id_seq'::regclass)"))
 
     with op.batch_alter_table('reviews', schema=None) as batch_op:
         batch_op.add_column(sa.Column('created_at', postgresql.TIMESTAMP(timezone=True), autoincrement=False, nullable=False))
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.create_foreign_key('reviews_user_id_fkey', 'users', ['user_id'], ['id'], ondelete='CASCADE')
-        batch_op.create_foreign_key('reviews_book_id_fkey', 'books', ['book_id'], ['id'], ondelete='CASCADE')
         batch_op.drop_constraint(None, type_='unique')
         batch_op.alter_column('book_id',
                existing_type=sa.Integer(),
@@ -141,7 +138,6 @@ def downgrade():
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.drop_constraint(None, type_='foreignkey')
         batch_op.drop_constraint(None, type_='foreignkey')
-        batch_op.create_foreign_key('favorites_book_id_fkey', 'books', ['book_id'], ['id'], ondelete='CASCADE')
         batch_op.create_foreign_key('favorites_user_id_fkey', 'users', ['user_id'], ['id'], ondelete='CASCADE')
         batch_op.drop_constraint(None, type_='unique')
         batch_op.drop_constraint(None, type_='unique')
@@ -157,27 +153,6 @@ def downgrade():
         batch_op.drop_column('personal_book_id')
         batch_op.drop_column('explore_book_id')
 
-    op.create_table('api_books',
-    sa.Column('id', sa.BIGINT(), autoincrement=True, nullable=False),
-    sa.Column('cover_image', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('title', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('author', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('genre', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('category', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.PrimaryKeyConstraint('id', name='api_books_pkey')
-    )
-    op.create_table('books',
-    sa.Column('id', sa.BIGINT(), autoincrement=True, nullable=False),
-    sa.Column('cover_image', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('title', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('author', sa.TEXT(), autoincrement=False, nullable=False),
-    sa.Column('genre', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('category', sa.TEXT(), autoincrement=False, nullable=True),
-    sa.Column('created_date', sa.DATE(), autoincrement=False, nullable=False),
-    sa.Column('user_id', sa.BIGINT(), autoincrement=False, nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name='books_user_id_fkey', ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id', name='books_pkey')
-    )
     op.drop_table('personal_books', schema='public')
     op.drop_table('explore_books', schema='public')
     # ### end Alembic commands ###
