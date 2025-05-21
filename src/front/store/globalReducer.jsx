@@ -7,13 +7,17 @@ export const GlobalContext = createContext();
 const initialState = {
     user: null,
     isAuthenticated: false,
-    // Fix: Ensure apiUrl doesn't have trailing slashes and is properly formed
+    // Ensure apiUrl doesn't have trailing slashes and is properly formed
     apiUrl: import.meta.env.VITE_BACKEND_URL || "http://localhost:3001",
     message: null,
     isLoading: false,
-    // Nuevos estados para los libros
+    // Estados para los libros de exploración
     books: [],
     totalBooks: 0,
+    // Estados para libros personales
+    personalBooks: [],
+    totalPersonalBooks: 0,
+    // Estados compartidos
     currentPage: 1,
     booksPerPage: 7,
     filters: {
@@ -34,15 +38,22 @@ export const ACTIONS = {
     CLEAR_MESSAGE: 'clear_message',
     SET_LOADING: 'set_loading',
     LOGOUT: 'logout',
-    SET_HELLO: 'set_hello', // Para el mensaje de bienvenida/ejemplo
+    SET_HELLO: 'set_hello',
 
-    // Nuevas acciones para los libros
+    // Acciones para los libros de exploración
     SET_BOOKS: 'set_books',
     SET_TOTAL_BOOKS: 'set_total_books',
     SET_CURRENT_PAGE: 'set_current_page',
     SET_BOOKS_PER_PAGE: 'set_books_per_page',
     SET_FILTERS: 'set_filters',
     CLEAR_FILTERS: 'clear_filters',
+
+    // Acciones para libros personales
+    SET_PERSONAL_BOOKS: 'set_personal_books',
+    SET_TOTAL_PERSONAL_BOOKS: 'set_total_personal_books',
+    ADD_PERSONAL_BOOK: 'add_personal_book',
+    UPDATE_PERSONAL_BOOK: 'update_personal_book',
+    REMOVE_PERSONAL_BOOK: 'remove_personal_book',
 
     // Siembra de libros
     SEED_BOOKS: 'seed_books',
@@ -67,7 +78,7 @@ function reducer(state, action) {
         case ACTIONS.SET_HELLO:
             return { ...state, hello: action.payload };
 
-        // Nuevos cases para los libros
+        // Cases para los libros de exploración
         case ACTIONS.SET_BOOKS:
             return { ...state, books: action.payload };
         case ACTIONS.SET_TOTAL_BOOKS:
@@ -92,6 +103,31 @@ function reducer(state, action) {
                 }
             };
 
+        // Cases para libros personales
+        case ACTIONS.SET_PERSONAL_BOOKS:
+            return { ...state, personalBooks: action.payload };
+        case ACTIONS.SET_TOTAL_PERSONAL_BOOKS:
+            return { ...state, totalPersonalBooks: action.payload };
+        case ACTIONS.ADD_PERSONAL_BOOK:
+            return {
+                ...state,
+                personalBooks: [...state.personalBooks, action.payload],
+                totalPersonalBooks: state.totalPersonalBooks + 1
+            };
+        case ACTIONS.UPDATE_PERSONAL_BOOK:
+            return {
+                ...state,
+                personalBooks: state.personalBooks.map(book =>
+                    book.id === action.payload.id ? action.payload : book
+                )
+            };
+        case ACTIONS.REMOVE_PERSONAL_BOOK:
+            return {
+                ...state,
+                personalBooks: state.personalBooks.filter(book => book.id !== action.payload),
+                totalPersonalBooks: state.totalPersonalBooks - 1
+            };
+
         // Siembra de Libros
         case ACTIONS.SEED_BOOKS:
             return { ...state, isSeeding: action.payload };
@@ -103,7 +139,6 @@ function reducer(state, action) {
 }
 
 // Hook personalizado para usar el reducer global
-// Asegúrate de que esta función está exportada correctamente
 export const useGlobalReducer = () => {
     const context = useContext(GlobalContext);
     if (!context) {
@@ -323,7 +358,7 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.CLEAR_MESSAGE });
         },
 
-        // Nueva función para obtener libros
+        // Función para obtener libros de exploración
         getBooks: async (page = 1, filters = {}) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
@@ -373,6 +408,176 @@ export const GlobalProvider = ({ children }) => {
             }
         },
 
+        // Obtener libros personales
+        getPersonalBooks: async (page = 1, filters = {}) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                // Construir parámetros de consulta para paginación y filtros
+                const queryParams = new URLSearchParams();
+                if (page) queryParams.append('page', page);
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value) queryParams.append(key, value);
+                });
+
+                const apiUrl = `${store.apiUrl}/api/personal-books?${queryParams.toString()}`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching personal books');
+                }
+
+                const data = await response.json();
+
+                dispatch({ type: ACTIONS.SET_PERSONAL_BOOKS, payload: data.data || [] });
+                dispatch({ type: ACTIONS.SET_TOTAL_PERSONAL_BOOKS, payload: data.count || 0 });
+                dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return data.data || [];
+            } catch (error) {
+                console.error("Error fetching personal books:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Error al cargar tus libros. Por favor, intenta más tarde."
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return [];
+            }
+        },
+
+        // Crear un libro personal
+        createPersonalBook: async (bookData) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/personal-books`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Error creating book");
+                }
+
+                const data = await response.json();
+
+                dispatch({ type: ACTIONS.ADD_PERSONAL_BOOK, payload: data.book });
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Libro creado exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                console.error("Error creating personal book:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al crear el libro: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
+            }
+        },
+
+        // Actualizar un libro personal
+        updatePersonalBook: async (bookData) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/personal-books/${bookData.id}`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Error updating book");
+                }
+
+                const data = await response.json();
+
+                dispatch({ type: ACTIONS.UPDATE_PERSONAL_BOOK, payload: data.book });
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Libro actualizado exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                console.error("Error updating personal book:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al actualizar el libro: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
+            }
+        },
+
+        // Eliminar un libro personal
+        deletePersonalBook: async (bookId) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const apiUrl = `${store.apiUrl}/api/personal-books/${bookId}`;
+                const token = sessionStorage.getItem("token");
+
+                const response = await fetch(apiUrl, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || "Error deleting book");
+                }
+
+                dispatch({ type: ACTIONS.REMOVE_PERSONAL_BOOK, payload: bookId });
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Libro eliminado exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                console.error("Error deleting personal book:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al eliminar el libro: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
+            }
+        },
+
         setFilters: (filters) => {
             dispatch({ type: ACTIONS.SET_FILTERS, payload: filters });
         },
@@ -385,21 +590,31 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
         },
 
+        // Función para establecer un mensaje
+        setMessage: (message) => {
+            dispatch({ type: ACTIONS.SET_MESSAGE, payload: message });
+
+            // Limpiar el mensaje después de 5 segundos
+            setTimeout(() => {
+                dispatch({ type: ACTIONS.CLEAR_MESSAGE });
+            }, 5000);
+        },
+
         // Siembra de Libros
         seedBooks: async () => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
             dispatch({ type: ACTIONS.SEED_BOOKS, payload: true });
-            
+
             try {
                 const totalPages = 10;
                 let booksSeeded = 0;
-                
-                for(let page = 1; page <= totalPages; page++) {
+
+                for (let page = 1; page <= totalPages; page++) {
                     const gutendexUrl = `https://gutendex.com/books?page=${page}`;
                     const response = await fetch(gutendexUrl);
                     const data = await response.json();
-                    
-                    for(const book of data.results) {
+
+                    for (const book of data.results) {
                         const processedBook = {
                             title: book.title,
                             author: book.authors?.[0]?.name || 'Unknown Author',
@@ -417,13 +632,13 @@ export const GlobalProvider = ({ children }) => {
                             },
                             body: JSON.stringify(processedBook)
                         });
-                        
+
                         booksSeeded++;
                         const progress = Math.round((booksSeeded / (totalPages * 32)) * 100);
                         dispatch({ type: ACTIONS.SET_SEEDING_PROGRESS, payload: progress });
                     }
                 }
-                
+
                 dispatch({ type: ACTIONS.SET_MESSAGE, payload: '¡Base de datos poblada exitosamente!' });
             } catch (error) {
                 dispatch({ type: ACTIONS.SET_MESSAGE, payload: 'Error al poblar la base de datos' });
