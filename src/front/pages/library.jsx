@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Añadir Link
 import { useGlobalReducer } from "../store/globalReducer";
 import { Pagination } from "../component/Pagination";
 import { FilterBar } from "../component/FilterBar";
@@ -310,17 +310,25 @@ export const Library = () => {
                             </div>
                         </div>
                     </div>
-                    {/* Botón para agregar nuevo libro */}
-                    <button
-                        className="btn btn-primary btn-lg"
-                        onClick={() => {
-                            resetForm();
-                            setShowAddModal(true);
-                        }}
-                    >
-                        <i className="fa-solid fa-plus me-2"></i>
-                        Agregar Libro
-                    </button>
+                    <div className="d-flex gap-3">
+                        {/* Botón para ver los libros de otros usuarios */}
+                        <Link to="/other-books" className="btn btn-outline-light btn-lg">
+                            <i className="fa-solid fa-users me-2"></i>
+                            Otros Libros
+                        </Link>
+
+                        {/* Botón para agregar nuevo libro */}
+                        <button
+                            className="btn btn-primary btn-lg"
+                            onClick={() => {
+                                resetForm();
+                                setShowAddModal(true);
+                            }}
+                        >
+                            <i className="fa-solid fa-plus me-2"></i>
+                            Agregar Libro
+                        </button>
+                    </div>
                 </div>
 
                 {/* Barra de filtros */}

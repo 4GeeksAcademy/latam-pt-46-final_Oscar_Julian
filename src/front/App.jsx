@@ -6,6 +6,7 @@ import { Login } from "./pages/login";
 import { Signup } from "./pages/signup";
 import { Welcome } from "./pages/welcome";
 import { Library } from "./pages/library";
+import { OtherBooks } from "./pages/OtherBooks"; // Importar la nueva página
 import { NotFound } from "./pages/notFound";
 import { Navbar } from "./component/Navbar";
 import { Footer } from "./component/Footer";
@@ -40,7 +41,16 @@ const App = () => {
                                     <Welcome />
                                 </ProtectedRoute>
                             } />
-                            <Route path="/library" element={<Library />} />
+                            <Route path="/library" element={
+                                <ProtectedRoute>
+                                    <Library />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/other-books" element={
+                                <ProtectedRoute>
+                                    <OtherBooks />
+                                </ProtectedRoute>
+                            } />
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                         <Footer />

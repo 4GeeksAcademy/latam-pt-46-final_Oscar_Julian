@@ -170,10 +170,13 @@ def create_explore_book():
 @jwt_required()
 def get_all_personal_books():
     try:
-        # Get all personal books from database
-        books = PersonalBook.query.all()
+        # Obtener el ID del usuario actual
+        current_user_id = get_jwt_identity()
 
-        # Serialize the results
+        # Obtener solo los libros del usuario actual
+        books = PersonalBook.query.filter_by(created_by=current_user_id).all()
+
+        # Serializar los resultados
         serialized_books = [book.serialize() for book in books]
 
         return jsonify({
@@ -309,6 +312,49 @@ def delete_personal_book(book_id):
         db.session.rollback()
         return jsonify({
             "message": f"Server error: {str(e)}"
+        }), 500
+
+
+#  --------------------------------------------- OTHER USERS BOOKS ---------------------------------------------------------------------
+@api.route('/other-users-books', methods=['GET'])
+@jwt_required()
+def get_other_users_books():
+    try:
+        # Obtener el ID del usuario actual
+        current_user_id = get_jwt_identity()
+
+        # Obtener los libros de otros usuarios (no del usuario actual)
+        books = PersonalBook.query.filter(
+            PersonalBook.created_by != current_user_id).all()
+
+        # Agrupar libros por usuario
+        books_by_user = {}
+        for book in books:
+            if book.created_by not in books_by_user:
+                # Obtener información del usuario
+                user = User.query.get(book.created_by)
+                user_email = user.email if user else "Usuario desconocido"
+                books_by_user[book.created_by] = {
+                    "user_id": book.created_by,
+                    "user_email": user_email,
+                    "books": []
+                }
+
+            books_by_user[book.created_by]["books"].append(book.serialize())
+
+        # Convertir el diccionario a una lista para la respuesta
+        result = list(books_by_user.values())
+
+        return jsonify({
+            "success": True,
+            "count": len(books),
+            "data": result
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "message": f"Error retrieving other users' books: {str(e)}"
         }), 500
 
 #  --------------------------------------------- USER ---------------------------------------------------------------------
