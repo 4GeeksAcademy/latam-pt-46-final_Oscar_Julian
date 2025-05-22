@@ -755,14 +755,16 @@ export const GlobalProvider = ({ children }) => {
                     for (const book of data.results) {
                         const processedBook = {
                             title: book.title,
-                            author: book.authors?.[0]?.name || 'Unknown Author',
+                            author_name: book.authors?.[0]?.name || 'Unknown Author',
                             genre: book.subjects?.[0] || 'General',
                             category: book.bookshelves?.[0] || 'Uncategorized',
                             cover_image: book.formats?.['image/jpeg'] || '',
-                            created_date: new Date().toISOString().split('T')[0]
+                            summary: book.texts?.[0]?.text || '',
+                            created_by: 1,
+                            created_date: new Date().toISOString().split('T')[0] 
                         };
 
-                        await fetch(`${store.apiUrl}/api/books`, {
+                        await fetch(`${store.apiUrl}/api/explore-books`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -785,6 +787,7 @@ export const GlobalProvider = ({ children }) => {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
             }
         },
+
 
         // ====== FUNCIONES PARA REVIEWS ======
 

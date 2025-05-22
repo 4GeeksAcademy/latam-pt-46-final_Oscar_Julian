@@ -312,7 +312,9 @@ export const Library = () => {
             });
 
             if (!response.ok) throw new Error('Error fetching details');
-            const data = await response.json();
+            const data = await response.json(); 
+            console.log(data);
+            
             setBookDetails(data);
         } catch (error) {
             actions.setMessage("Error al cargar detalles: " + error.message);
@@ -747,19 +749,19 @@ export const Library = () => {
                                         <div className="col-md-8">
                                             <h3 className="mb-3">{bookDetails.title}</h3>
                                             <div className="details-section">
-                                                <div className="detail-item">
+                                                <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-user-pen text-primary me-2"></i>
-                                                    <strong>Autor:</strong> {bookDetails.author_name}
+                                                    <strong className="text-dark">Autor:</strong> {bookDetails.author_name}
                                                 </div>
-                                                <div className="detail-item">
+                                                <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-tag text-primary me-2"></i>
-                                                    <strong>Género:</strong> {bookDetails.genre || 'No especificado'}
+                                                    <strong className="text-dark">Género:</strong> {bookDetails.genre || 'No especificado'}
                                                 </div>
-                                                <div className="detail-item">
+                                                <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-list text-primary me-2"></i>
-                                                    <strong>Categoría:</strong> {bookDetails.category || 'No especificada'}
+                                                    <strong className="text-dark">Categoría:</strong> {bookDetails.category || 'No especificada'}
                                                 </div>
-                                                <div className="detail-item">
+                                                <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-calendar-day text-primary me-2"></i>
                                                     <strong>Agregado el:</strong> {new Date(bookDetails.created_at).toLocaleDateString()}
                                                 </div>
@@ -768,7 +770,7 @@ export const Library = () => {
                                                         <i className="fa-solid fa-file-lines me-2"></i>
                                                         Resumen
                                                     </h5>
-                                                    <p className="text-muted">
+                                                    <p className="text-dark">
                                                         {bookDetails.summary || 'Este libro no tiene resumen.'}
                                                     </p>
                                                 </div>

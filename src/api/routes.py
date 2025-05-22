@@ -120,6 +120,7 @@ def login():
 
 
 @api.route('/explore-books', methods=['GET'])
+@jwt_required()
 def get_all_explore_books():
     try:
         # Get all explore books from database
@@ -142,6 +143,7 @@ def get_all_explore_books():
 
 
 @api.route('/explore-books/<int:book_id>', methods=['GET'])
+@jwt_required()
 def get_single_explore_book(book_id):
     try:
         book = ExploreBook.query.get(book_id)
