@@ -1,4 +1,3 @@
-from api.models import User, ExploreBook, PersonalBook, Favorite, Review
 import logging
 from logging.config import fileConfig
 
@@ -40,7 +39,10 @@ def get_engine_url():
 config.set_main_option('sqlalchemy.url', get_engine_url())
 target_db = current_app.extensions['migrate'].db
 
-# Import all models here to ensure they are registered with SQLAlchemy
+# other values from the config, defined by the needs of env.py,
+# can be acquired:
+# my_important_option = config.get_main_option("my_important_option")
+# ... etc.
 
 
 def get_metadata():

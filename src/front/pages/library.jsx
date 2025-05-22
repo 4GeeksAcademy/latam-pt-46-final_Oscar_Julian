@@ -29,6 +29,11 @@ export const Library = () => {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
 
+    // Mostrar libors independientemente
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [bookDetails, setBookDetails] = useState(null);
+    const [detailLoading, setDetailLoading] = useState(false);
+
     // Configurar AWS S3
     const configureS3 = () => {
         AWS.config.update({
@@ -295,6 +300,28 @@ export const Library = () => {
 
     // Obtener libros filtrados
     const filteredBooks = getFilteredBooks();
+
+    // Función para obtener detalles completos del libro
+    const fetchBookDetails = async (bookId) => {
+        setDetailLoading(true);
+        try {
+            const response = await fetch(`/personal-books/${bookId}`);
+            if (!response.ok) throw new Error('Error fetching details');
+            const data = await response.json();
+            setBookDetails(data);
+        } catch (error) {
+            actions.setMessage("Error al cargar detalles: " + error.message);
+        } finally {
+            setDetailLoading(false);
+        }
+    };
+
+    // Manejar click en la tarjeta
+    const handleBookClick = async (book) => {
+        setSelectedBook(book);
+        await fetchBookDetails(book.id);
+        setShowDetailModal(true);
+    };
 
     return (
         <div className="book-library-container">
