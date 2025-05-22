@@ -1,6 +1,10 @@
-export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews }) => {
+export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onViewDetails  }) => {
     return (
-        <div className="book-card-container">
+        <div 
+            className="book-card-container"
+            onClick={() => onViewDetails(book)}
+            style={{ cursor: 'pointer' }}
+            >
             <div className="book-card">
                 <div className="book-cover">
                     {book.cover_image ? (

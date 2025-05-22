@@ -197,7 +197,7 @@ export const useGlobalReducer = () => {
 
 // Debug function to help with URL issues
 const logApiCall = (endpoint, url) => {
-    console.log(`API call to ${endpoint}:`, url);
+    // console.log(`API call to ${endpoint}:`, url);
     return url;
 };
 
@@ -207,7 +207,7 @@ export const GlobalProvider = ({ children }) => {
 
     // For debugging - log the API URL on load
     useEffect(() => {
-        console.log("Current API URL:", store.apiUrl);
+        // console.log("Current API URL:", store.apiUrl);
     }, [store.apiUrl]);
 
     // Verificar token al cargar el proveedor
@@ -218,7 +218,7 @@ export const GlobalProvider = ({ children }) => {
             if (token) {
                 try {
                     const apiUrl = `${store.apiUrl}/api/user`;
-                    console.log("Validating token using URL:", apiUrl);
+                    // console.log("Validating token using URL:", apiUrl);
 
                     const response = await fetch(apiUrl, {
                         method: "GET",
@@ -233,11 +233,11 @@ export const GlobalProvider = ({ children }) => {
                         dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: true });
                     } else {
                         // Token inválido o expirado
-                        console.log("Token validation failed:", response.status);
+                        // console.log("Token validation failed:", response.status);
                         sessionStorage.removeItem("token");
                     }
                 } catch (error) {
-                    console.error("Error validating token on load:", error);
+                    // console.error("Error validating token on load:", error);
                     sessionStorage.removeItem("token");
                 }
             }
@@ -253,7 +253,7 @@ export const GlobalProvider = ({ children }) => {
 
             try {
                 const apiUrl = `${store.apiUrl}/api/signup`;
-                console.log("Signup request to:", apiUrl);
+                // console.log("Signup request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
@@ -294,7 +294,7 @@ export const GlobalProvider = ({ children }) => {
                     return true;
                 }
             } catch (error) {
-                console.error("Signup error:", error);
+                // console.error("Signup error:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Network error. Please check your connection and try again."
@@ -419,7 +419,7 @@ export const GlobalProvider = ({ children }) => {
                     apiUrl += `&search=${encodeURIComponent(filters.search)}`;
                 }
 
-                console.log("Fetching books from:", apiUrl);
+                // console.log("Fetching books from:", apiUrl);
 
                 const response = await fetch(apiUrl);
 
@@ -446,7 +446,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return processedBooks;
             } catch (error) {
-                console.error("Error fetching books:", error);
+                // console.error("Error fetching books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error loading books. Please try again later."
@@ -491,7 +491,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return data.data || [];
             } catch (error) {
-                console.error("Error fetching personal books:", error);
+                // console.error("Error fetching personal books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar tus libros. Por favor, intenta más tarde."
@@ -534,7 +534,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Error creating personal book:", error);
+                // console.error("Error creating personal book:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al crear el libro: ${error.message}`
@@ -577,7 +577,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Error updating personal book:", error);
+                // console.error("Error updating personal book:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al actualizar el libro: ${error.message}`
@@ -616,7 +616,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Error deleting personal book:", error);
+                // console.error("Error deleting personal book:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al eliminar el libro: ${error.message}`
@@ -675,7 +675,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return data.data || [];
             } catch (error) {
-                console.error("Error fetching other users books:", error);
+                // console.error("Error fetching other users books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar los libros de otros usuarios. Por favor, intenta más tarde."
@@ -728,7 +728,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return userBooks;
             } catch (error) {
-                console.error("Error fetching personal books:", error);
+                // console.error("Error fetching personal books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar tus libros. Por favor, intenta más tarde."
@@ -813,7 +813,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return reviews;
             } catch (error) {
-                console.error("Error fetching book reviews:", error);
+                // console.error("Error fetching book reviews:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar las reviews. Por favor, intenta más tarde."
@@ -855,7 +855,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Error creating review:", error);
+                // console.error("Error creating review:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al crear la review: ${error.message}`
@@ -897,7 +897,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Error updating review:", error);
+                // console.error("Error updating review:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al actualizar la review: ${error.message}`
@@ -936,7 +936,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                console.error("Error deleting review:", error);
+                // console.error("Error deleting review:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al eliminar la review: ${error.message}`

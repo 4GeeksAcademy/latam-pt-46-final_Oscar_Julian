@@ -8,8 +8,16 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
 
+# Configuración CORS manual (Añade esto)
+@api.after_request
+def add_cors_headers(response):
+    response.headers['Access-Control-Allow-Origin'] = 'https://opulent-trout-v6gqxjv7wqpvhvxx-3000.app.github.dev'
+    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+    return response
+
 # Allow CORS requests to this API
-CORS(api)
+CORS(api, origins="*")
 
 #  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------
 
