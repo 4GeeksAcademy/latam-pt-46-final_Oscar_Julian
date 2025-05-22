@@ -307,7 +307,7 @@ export const Library = () => {
         try {
             const response = await fetch(`${store.apiUrl}/personal-books/${bookId}`);
             console.log(response.json());
-            
+
             if (!response.ok) throw new Error('Error fetching details');
             const data = await response.json();
             setBookDetails(data);
@@ -394,7 +394,7 @@ export const Library = () => {
                                         onEdit={prepareEditBook}
                                         onDelete={prepareDeleteBook}
                                         onViewReviews={prepareViewReviews}
-                                        // onViewDetails={handleBookClick} 
+                                        onViewDetails={handleBookClick} 
                                     />
                                 </div>
                             ))}
@@ -706,7 +706,7 @@ export const Library = () => {
             )}
 
             {/* Modal de Detalles del Libro */}
-            {/* {showDetailModal && (
+            {showDetailModal && (
                 <div className="modal show d-block" tabIndex="-1">
                     <div className="modal-dialog modal-lg">
                         <div className="modal-content">
@@ -715,9 +715,9 @@ export const Library = () => {
                                     <i className="fa-solid fa-circle-info me-2"></i>
                                     Detalles Completos
                                 </h5>
-                                <button 
-                                    type="button" 
-                                    className="btn btn-sm btn-outline-light rounded-circle" 
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-light rounded-circle"
                                     onClick={() => setShowDetailModal(false)}
                                     style={{ width: "32px", height: "32px" }}
                                 >
@@ -780,9 +780,9 @@ export const Library = () => {
                                 )}
                             </div>
                             <div className="modal-footer">
-                                <button 
-                                    type="button" 
-                                    className="btn btn-secondary" 
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
                                     onClick={() => setShowDetailModal(false)}
                                 >
                                     <i className="fa-solid fa-xmark me-2"></i>
@@ -792,7 +792,7 @@ export const Library = () => {
                         </div>
                     </div>
                 </div>
-            )} */}
+            )}
 
             {/* Modal para ver reviews */}
             <ViewReviewsModal
