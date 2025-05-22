@@ -342,7 +342,7 @@ export const Library = () => {
                 </div>
 
                 {/* Barra de filtros */}
-                <FilterBar />
+                <FilterBar bookType="personal" />
 
                 {/* Área principal de libros */}
                 {store.isLoading ? (

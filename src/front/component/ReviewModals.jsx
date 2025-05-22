@@ -1,6 +1,3 @@
-import React from "react";
-
-// Modal para crear una nueva review
 export const CreateReviewModal = ({
     show,
     onClose,

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useGlobalReducer } from "../store/globalReducer";
 
-export const FilterBar = () => {
+export const FilterBar = ({ bookType = "explore" }) => {
     const { store, actions, dispatch } = useGlobalReducer();
 
     // Estados para los selectores de filtro y ordenamiento
@@ -16,22 +16,40 @@ export const FilterBar = () => {
     const [uniqueGenres, setUniqueGenres] = useState([]);
     const [uniqueCategories, setUniqueCategories] = useState([]);
 
+    // Determinar qué libros usar según el tipo
+    const getBooksData = () => {
+        if (bookType === "personal") {
+            return store.personalBooks || [];
+        }
+        return store.books || [];
+    };
+
+    // Obtener el nombre del autor según el tipo de libro
+    const getAuthorName = (book) => {
+        if (bookType === "personal") {
+            return book.author_name;
+        }
+        return book.author;
+    };
+
     // Extraer los valores únicos de los libros cuando cambian
     useEffect(() => {
-        if (store.books && store.books.length > 0) {
+        const booksData = getBooksData();
+
+        if (booksData && booksData.length > 0) {
             // Extraer autores únicos
-            const authors = [...new Set(store.books.map(book => book.author))];
+            const authors = [...new Set(booksData.map(book => getAuthorName(book)).filter(Boolean))];
             setUniqueAuthors(authors.sort());
 
             // Extraer géneros únicos
-            const genres = [...new Set(store.books.map(book => book.genre))];
+            const genres = [...new Set(booksData.map(book => book.genre).filter(Boolean))];
             setUniqueGenres(genres.sort());
 
             // Extraer categorías únicas
-            const categories = [...new Set(store.books.map(book => book.category))];
+            const categories = [...new Set(booksData.map(book => book.category).filter(Boolean))];
             setUniqueCategories(categories.sort());
         }
-    }, [store.books]);
+    }, [bookType === "personal" ? store.personalBooks : store.books, bookType]);
 
     // Aplicar filtros
     const applyFilters = () => {
@@ -42,7 +60,13 @@ export const FilterBar = () => {
         };
 
         actions.setFilters(filters);
-        actions.getBooks(1, { ...store.filters, ...filters });
+
+        // Llamar a la función correcta según el tipo de libro
+        if (bookType === "personal") {
+            actions.getPersonalBooks(1, { ...store.filters, ...filters });
+        } else {
+            actions.getBooks(1, { ...store.filters, ...filters });
+        }
     };
 
     // Limpiar filtros
@@ -54,16 +78,31 @@ export const FilterBar = () => {
         setSortOrder("asc");
 
         actions.clearFilters();
-        actions.getBooks(1, {});
+
+        // Llamar a la función correcta según el tipo de libro
+        if (bookType === "personal") {
+            actions.getPersonalBooks(1, {});
+        } else {
+            actions.getBooks(1, {});
+        }
     };
 
     // Aplicar ordenamiento
     const applySort = () => {
-        if (!store.books || store.books.length === 0) return;
+        const booksData = getBooksData();
+        if (!booksData || booksData.length === 0) return;
 
-        const sortedBooks = [...store.books].sort((a, b) => {
-            let valueA = a[sortBy]?.toLowerCase() || "";
-            let valueB = b[sortBy]?.toLowerCase() || "";
+        const sortedBooks = [...booksData].sort((a, b) => {
+            let valueA = "";
+            let valueB = "";
+
+            if (sortBy === "author") {
+                valueA = getAuthorName(a)?.toLowerCase() || "";
+                valueB = getAuthorName(b)?.toLowerCase() || "";
+            } else {
+                valueA = a[sortBy]?.toLowerCase() || "";
+                valueB = b[sortBy]?.toLowerCase() || "";
+            }
 
             if (sortOrder === "asc") {
                 return valueA.localeCompare(valueB);
@@ -72,17 +111,21 @@ export const FilterBar = () => {
             }
         });
 
-        // Usar dispatch correctamente con el action type
-        dispatch({ type: 'set_books', payload: sortedBooks });
+        // Usar dispatch correctamente con el action type apropiado
+        if (bookType === "personal") {
+            dispatch({ type: 'set_personal_books', payload: sortedBooks });
+        } else {
+            dispatch({ type: 'set_books', payload: sortedBooks });
+        }
     };
 
     // Aplicar ordenamiento cuando cambian los parámetros de ordenamiento
-    // FIX: Add sortBy and sortOrder to dependency array, and remove store.books
     useEffect(() => {
-        if (store.books && store.books.length > 0) {
+        const booksData = getBooksData();
+        if (booksData && booksData.length > 0) {
             applySort();
         }
-    }, [sortBy, sortOrder]); // Removed store.books from dependencies
+    }, [sortBy, sortOrder]);
 
     return (
         <div className="filter-bar p-3 mb-4 rounded shadow-sm">
