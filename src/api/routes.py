@@ -10,9 +10,10 @@ api = Blueprint('api', __name__)
 
 # Configure CORS with specific settings for GitHub Codespaces
 CORS(api,
-    #  origins=["*"],  # Allow all origins for development
+     origins=["*"],  # Allow all origins for development
      methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-     allow_headers=["Content-Type", "Authorization"])
+     allow_headers=["Content-Type", "Authorization"],
+     supports_credentials=True)
 
 
 @api.before_request
@@ -22,15 +23,18 @@ def handle_preflight():
         response.headers['Access-Control-Allow-Origin'] = '*'
         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
         response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        response.headers['Access-Control-Max-Age'] = '3600'
         return response
 
 
 @api.after_request
 def after_request(response):
+    # response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers',
                          'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods',
                          'GET,PUT,POST,DELETE,OPTIONS')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
 
 #  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------

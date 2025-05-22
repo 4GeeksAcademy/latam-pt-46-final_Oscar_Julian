@@ -305,8 +305,11 @@ export const Library = () => {
     const fetchBookDetails = async (bookId) => {
         setDetailLoading(true);
         try {
-            const response = await fetch(`${store.apiUrl}/personal-books/${bookId}`);
-            console.log(response.json());
+            const response = await fetch(`${store.apiUrl}/api/personal-books/${bookId}`, {
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+                }
+            });
 
             if (!response.ok) throw new Error('Error fetching details');
             const data = await response.json();
@@ -394,7 +397,7 @@ export const Library = () => {
                                         onEdit={prepareEditBook}
                                         onDelete={prepareDeleteBook}
                                         onViewReviews={prepareViewReviews}
-                                        onViewDetails={handleBookClick} 
+                                        onViewDetails={handleBookClick}
                                     />
                                 </div>
                             ))}
