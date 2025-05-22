@@ -411,42 +411,56 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
             try {
-                // Construir la URL con parámetros de paginación
-                let apiUrl = `https://gutendex.com/books?page=${page}`;
+                // Construir la URL local con filtros (si aplican)
+                let apiUrl = `${store.apiUrl}/api/explore-books`;
 
-                // Añadir filtros de búsqueda si existen
-                if (filters.search) {
-                    apiUrl += `&search=${encodeURIComponent(filters.search)}`;
-                }
-
-                // console.log("Fetching books from:", apiUrl);
-
-                const response = await fetch(apiUrl);
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    }
+                });
 
                 if (!response.ok) {
-                    throw new Error('Error fetching books');
+                    throw new Error('Error fetching books from local API');
                 }
 
-                const data = await response.json();
+                const result = await response.json();
+                const data = result.data || [];
 
-                // Procesar los datos para extraer solo la información necesaria
-                const processedBooks = data.results.map(book => ({
+                // Filtrar por búsqueda en el cliente (ya que tu API no implementa filtros aún)
+                let filteredBooks = data;
+                if (filters.search) {
+                    const query = filters.search.toLowerCase();
+                    filteredBooks = data.filter(book =>
+                        book.title.toLowerCase().includes(query) ||
+                        book.author_name.toLowerCase().includes(query)
+                    );
+                }
+
+                // Paginación manual en el cliente
+                const booksPerPage = 100;
+                const startIndex = (page - 1) * booksPerPage;
+                const paginatedBooks = filteredBooks.slice(startIndex, startIndex + booksPerPage);
+
+                // Adaptar formato de cada libro (si es necesario)
+                const processedBooks = paginatedBooks.map(book => ({
                     id: book.id,
                     title: book.title,
-                    author: book.authors.length > 0 ? book.authors[0].name : 'Unknown Author',
-                    coverImage: book.formats['image/jpeg'] || '',
-                    genre: book.subjects && book.subjects.length > 0 ? book.subjects[0] : 'Uncategorized',
-                    category: book.bookshelves && book.bookshelves.length > 0 ? book.bookshelves[0] : 'Uncategorized'
+                    author: book.author_name,
+                    coverImage: book.cover_image,
+                    genre: book.genre || 'Uncategorized',
+                    category: book.category || 'Uncategorized'
                 }));
 
                 dispatch({ type: ACTIONS.SET_BOOKS, payload: processedBooks });
-                dispatch({ type: ACTIONS.SET_TOTAL_BOOKS, payload: data.count });
+                dispatch({ type: ACTIONS.SET_TOTAL_BOOKS, payload: filteredBooks.length });
                 dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
 
                 return processedBooks;
             } catch (error) {
-                // console.error("Error fetching books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error loading books. Please try again later."
