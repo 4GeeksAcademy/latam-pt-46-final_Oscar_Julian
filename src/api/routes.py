@@ -8,16 +8,30 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 
 api = Blueprint('api', __name__)
 
-# # Configuración CORS manual (Añade esto)
-# @api.after_request
-# def add_cors_headers(response):
-#     response.headers['Access-Control-Allow-Origin'] = 'https://opulent-trout-v6gqxjv7wqpvhvxx-3000.app.github.dev'
-#     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-#     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
-#     return response
+# Configure CORS with specific settings for GitHub Codespaces
+CORS(api,
+    #  origins=["*"],  # Allow all origins for development
+     methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization"])
 
-# Allow CORS requests to this API
-CORS(api)
+
+@api.before_request
+def handle_preflight():
+    if request.method == "OPTIONS":
+        response = jsonify()
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response
+
+
+@api.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers',
+                         'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods',
+                         'GET,PUT,POST,DELETE,OPTIONS')
+    return response
 
 #  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------
 
@@ -201,6 +215,7 @@ def get_all_personal_books():
 
 
 @api.route('/personal-books/<int:book_id>', methods=['GET'])
+@jwt_required()
 def get_single_personal_book(book_id):
     try:
         book = PersonalBook.query.get(book_id)
