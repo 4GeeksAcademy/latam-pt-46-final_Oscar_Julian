@@ -1,9 +1,9 @@
 import React from "react";
 
-export const BookCard = ({ book }) => {
+export const BookCard = ({ book, onViewDetails }) => {
     return (
         <div className="book-card">
-            <div className="book-cover">
+            <div className="book-cover" onClick={onViewDetails}>
                 {book.coverImage ? (
                     <img
                         src={book.coverImage}

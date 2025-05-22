@@ -9,6 +9,12 @@ export const Welcome = () => {
     const { store, actions } = useGlobalReducer();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    
+    // Estados para el modal de detalles
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedBook, setSelectedBook] = useState(null);
+    const [bookDetails, setBookDetails] = useState(null);
+    const [detailLoading, setDetailLoading] = useState(false);
 
     // Verificar autenticación cuando el componente carga
     useEffect(() => {
@@ -33,6 +39,33 @@ export const Welcome = () => {
             navigate("/login");
         }
     }, [store.isAuthenticated, loading, navigate]);
+
+    // Función para obtener detalles completos del libro
+    const fetchBookDetails = async (bookId) => {
+        setDetailLoading(true);
+        try {
+            const response = await fetch(`${store.apiUrl}/api/explore-books/${bookId}`, {
+                headers: {
+                    "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al obtener detalles');
+            const data = await response.json();
+            setBookDetails(data);
+        } catch (error) {
+            actions.setMessage("Error al cargar detalles: " + error.message);
+        } finally {
+            setDetailLoading(false);
+        }
+    };
+
+    // Manejar click en la tarjeta
+    const handleBookClick = async (book) => {
+        setSelectedBook(book);
+        await fetchBookDetails(book.id);
+        setShowDetailModal(true);
+    };
 
     // Filtrar libros localmente según los filtros aplicados
     const getFilteredBooks = () => {
@@ -120,7 +153,10 @@ export const Welcome = () => {
                                     className="book-appear"
                                     style={{ animationDelay: `${index * 0.05}s` }}
                                 >
-                                    <BookCard book={book} />
+                                    <BookCard 
+                                        book={book} 
+                                        onViewDetails={() => handleBookClick(book)}
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -146,6 +182,94 @@ export const Welcome = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal de Detalles del Libro */}
+            {showDetailModal && (
+                <div className="modal show d-block" tabIndex="-1">
+                    <div className="modal-dialog modal-lg">
+                        <div className="modal-content">
+                            <div className="modal-header bg-primary text-white">
+                                <h5 className="modal-title">
+                                    <i className="fa-solid fa-circle-info me-2"></i>
+                                    Detalles Completos
+                                </h5>
+                                <button
+                                    type="button"
+                                    className="btn btn-sm btn-outline-light rounded-circle"
+                                    onClick={() => setShowDetailModal(false)}
+                                    style={{ width: "32px", height: "32px" }}
+                                >
+                                    <span style={{ fontSize: "1.2rem" }}>&times;</span>
+                                </button>
+                            </div>
+                            <div className="modal-body">
+                                {detailLoading ? (
+                                    <div className="text-center py-4">
+                                        <div className="spinner-border text-primary" role="status">
+                                            <span className="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </div>
+                                ) : bookDetails ? (
+                                    <div className="row">
+                                        <div className="col-md-4 text-center">
+                                            <img
+                                                src={bookDetails.cover_image || '/default-book-cover.jpg'}
+                                                alt={`Portada de ${bookDetails.title}`}
+                                                className="img-fluid rounded shadow mb-3"
+                                                style={{ maxHeight: '300px' }}
+                                            />
+                                        </div>
+                                        <div className="col-md-8">
+                                            <h3 className="mb-3">{bookDetails.title}</h3>
+                                            <div className="details-section">
+                                                <div className="detail-item text-dark">
+                                                    <i className="fa-solid fa-user-pen text-primary me-2"></i>
+                                                    <strong className="text-dark">Autor:</strong> {bookDetails.author}
+                                                </div>
+                                                <div className="detail-item text-dark">
+                                                    <i className="fa-solid fa-tag text-primary me-2"></i>
+                                                    <strong className="text-dark">Género:</strong> {bookDetails.genre || 'No especificado'}
+                                                </div>
+                                                <div className="detail-item text-dark">
+                                                    <i className="fa-solid fa-list text-primary me-2"></i>
+                                                    <strong className="text-dark">Categoría:</strong> {bookDetails.category || 'No especificada'}
+                                                </div>
+                                                <div className="mt-4">
+                                                    <h5 className="text-primary">
+                                                        <i className="fa-solid fa-file-lines me-2"></i>
+                                                        Resumen
+                                                    </h5>
+                                                    <p className="text-dark">
+                                                        {bookDetails.summary || 'Este libro no tiene resumen.'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="text-center py-4 text-danger">
+                                        <i className="fa-solid fa-triangle-exclamation me-2"></i>
+                                        No se pudieron cargar los detalles
+                                    </div>
+                                )}
+                            </div>
+                            <div className="modal-footer">
+                                <button
+                                    type="button"
+                                    className="btn btn-secondary"
+                                    onClick={() => setShowDetailModal(false)}
+                                >
+                                    <i className="fa-solid fa-xmark me-2"></i>
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Overlay oscuro para el modal */}
+            {showDetailModal && <div className="modal-backdrop fade show"></div>}
         </div>
     );
 };
