@@ -758,7 +758,7 @@ export const GlobalProvider = ({ children }) => {
             dispatch({ type: ACTIONS.SEED_BOOKS, payload: true });
 
             try {
-                const totalPages = 10;
+                const totalPages = 1;
                 let booksSeeded = 0;
 
                 for (let page = 1; page <= totalPages; page++) {
@@ -773,7 +773,7 @@ export const GlobalProvider = ({ children }) => {
                             genre: book.subjects?.[0] || 'General',
                             category: book.bookshelves?.[0] || 'Uncategorized',
                             cover_image: book.formats?.['image/jpeg'] || '',
-                            summary: book.texts?.[0]?.text || '',
+                            summary: book.summaries?.[0] || '',
                             created_by: 1,
                             created_date: new Date().toISOString().split('T')[0] 
                         };

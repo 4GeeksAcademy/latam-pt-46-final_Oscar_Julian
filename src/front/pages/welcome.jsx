@@ -224,7 +224,7 @@ export const Welcome = () => {
                                             <div className="details-section">
                                                 <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-user-pen text-primary me-2"></i>
-                                                    <strong className="text-dark">Autor:</strong> {bookDetails.author}
+                                                    <strong className="text-dark">Autor:</strong> {bookDetails.author_name}
                                                 </div>
                                                 <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-tag text-primary me-2"></i>
