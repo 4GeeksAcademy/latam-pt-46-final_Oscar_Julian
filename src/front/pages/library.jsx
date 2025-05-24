@@ -34,6 +34,9 @@ export const Library = () => {
     const [bookDetails, setBookDetails] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
+    // Favorites
+    const [isFavorite, setIsFavorite] = useState(false);
+
     // Configurar AWS S3
     const configureS3 = () => {
         AWS.config.update({
@@ -44,14 +47,27 @@ export const Library = () => {
         return new AWS.S3();
     };
 
-    // Verificar autenticación cuando el componente carga
+    // Verificar autenticación cuando el componente carga, Libros favoritos
     useEffect(() => {
         const checkAuth = async () => {
             await actions.validateToken();
             setLoading(false);
         };
-
+        const checkFavoriteStatus = async () => {
+            if (!store.user) return;
+            
+            try {
+                const success = await actions.getFavorites();
+                if (success) {
+                    setIsFavorite(success)
+                }
+            } catch (error) {
+                console.error("Error checking favorites:", error);
+            }
+        };
+        checkFavoriteStatus();
         checkAuth();
+        console.log(isFavorite);
     }, []);
 
     // Cargar libros personales cuando el componente se monta
@@ -400,6 +416,7 @@ export const Library = () => {
                                         onDelete={prepareDeleteBook}
                                         onViewReviews={prepareViewReviews}
                                         onViewDetails={handleBookClick}
+                                        Favorites={isFavorite}
                                     />
                                 </div>
                             ))}

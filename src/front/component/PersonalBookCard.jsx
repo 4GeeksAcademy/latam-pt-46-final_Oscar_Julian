@@ -1,11 +1,25 @@
-export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onViewDetails  }) => {
+export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onViewDetails, Favorites }) => {
+
+    const isFavorite = Favorites?.favorites?.some(fav => 
+        fav.book?.title === book.title
+    );
+    
+
     return (
         <div 
             className="book-card-container"
             onClick={() => onViewDetails(book)}
             style={{ cursor: 'pointer' }}
-            >
+        >
             <div className="book-card">
+                {/* Estrella de favoritos */}
+                {isFavorite && (
+                    <div className="position-absolute top-0 start-0 m-2" 
+                         style={{ zIndex: 1, fontSize: "1.5rem" }}>
+                        <i className="fas fa-star text-warning"></i>
+                    </div>
+                )}
+
                 <div className="book-cover">
                     {book.cover_image ? (
                         <img
@@ -19,6 +33,7 @@ export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onView
                         </div>
                     )}
                 </div>
+                
                 <div className="book-info mt-3">
                     <h5 className="book-title text-truncate">{book.title}</h5>
                     <p className="book-author mb-1 text-truncate">{book.author_name}</p>
@@ -33,21 +48,30 @@ export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onView
             <div className="book-actions">
                 <button
                     className="btn btn-sm btn-outline-info me-1"
-                    onClick={() => onViewReviews(book)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onViewReviews(book);
+                    }}
                     title="Ver reviews"
                 >
                     <i className="fa-solid fa-comments"></i>
                 </button>
                 <button
                     className="btn btn-sm btn-outline-primary me-1"
-                    onClick={() => onEdit(book)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(book);
+                    }}
                     title="Editar libro"
                 >
                     <i className="fa-solid fa-edit"></i>
                 </button>
                 <button
                     className="btn btn-sm btn-outline-danger"
-                    onClick={() => onDelete(book)}
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(book);
+                    }}
                     title="Eliminar libro"
                 >
                     <i className="fa-solid fa-trash"></i>
