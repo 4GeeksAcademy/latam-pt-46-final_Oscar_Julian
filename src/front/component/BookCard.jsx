@@ -1,14 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useGlobalReducer } from "../store/globalReducer";
 
 export const BookCard = ({ book, onViewDetails }) => {
-    const { actions } = useGlobalReducer();
+    const { store, actions } = useGlobalReducer();
     const [isProcessing, setIsProcessing] = useState(false);
-    
+    const [isFavorite, setIsFavorite] = useState(false);
+
+    // Verificar si el libro está en favoritos
+    useEffect(() => {
+        const checkFavoriteStatus = async () => {
+            if (!store.user) return;
+            
+            try {
+                const { success, favorites } = await actions.getFavorites();
+                if (success) {
+                    const isBookFavorite = favorites.some(fav => 
+                        fav.book_type === 'explore' && fav.book?.id === book.id
+                    );
+                    setIsFavorite(isBookFavorite);
+                }
+            } catch (error) {
+                console.error("Error checking favorites:", error);
+            }
+        };
+
+        checkFavoriteStatus();
+    }, [store.user, book.id, actions]);
+
     const handleAddToLibraryAndFavorites = async () => {
         setIsProcessing(true);
         try {
-            // Paso 1: Crear en personal-books
             const personalBookData = {
                 title: book.title,
                 author_name: book.author,
@@ -17,14 +38,13 @@ export const BookCard = ({ book, onViewDetails }) => {
                 summary: book.summary,
                 cover_image: book.coverImage
             };
-            
+
             const personalBookResponse = await actions.createPersonalBookFromExplore(personalBookData);
             
             if (personalBookResponse) {
-                // Paso 2: Agregar a favoritos
                 const favoriteResponse = await actions.addExploreFavorite(book.id);
-                
                 if (favoriteResponse) {
+                    setIsFavorite(true); // Actualizar estado local
                     actions.setMessage("¡Libro agregado a tu biblioteca y favoritos!");
                 }
             }
@@ -35,16 +55,18 @@ export const BookCard = ({ book, onViewDetails }) => {
 
     return (
         <div className="book-card position-relative">
-            {/* Estrella de favoritos */}
-            <button 
-                className="btn btn-icon position-absolute top-0 start-0 m-2"
-                onClick={handleAddToLibraryAndFavorites}
-                disabled={isProcessing}
-                style={{ zIndex: 1 }}
-            >
-                <i className={`fa${isProcessing ? ' fa-spinner fa-spin' : 's'} fa-star text-warning`}></i>
-            </button>
-            
+            {/* Mostrar estrella solo si no es favorito */}
+            {!isFavorite && (
+                <button
+                    className="btn btn-icon position-absolute top-0 start-0 m-2"
+                    onClick={handleAddToLibraryAndFavorites}
+                    disabled={isProcessing}
+                    style={{ zIndex: 1 }}
+                >
+                    <i className={`fa${isProcessing ? ' fa-spinner fa-spin' : 's'} fa-star text-warning`}></i>
+                </button>
+            )}
+
             <div className="book-cover" onClick={onViewDetails}>
                 {book.coverImage ? (
                     <img
@@ -58,6 +80,7 @@ export const BookCard = ({ book, onViewDetails }) => {
                     </div>
                 )}
             </div>
+            
             <div className="book-info mt-3">
                 <h5 className="book-title text-truncate">{book.title}</h5>
                 <p className="book-author mb-1 text-truncate">{book.author}</p>

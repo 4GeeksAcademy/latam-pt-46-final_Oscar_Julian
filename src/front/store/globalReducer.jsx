@@ -964,45 +964,73 @@ export const GlobalProvider = ({ children }) => {
         },
 
         createPersonalBookFromExplore: async (bookData) => {
-        try {
-            const token = sessionStorage.getItem("token");
-            const response = await fetch(`${store.apiUrl}/api/personal-books`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(bookData)
-            });
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/personal-books`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(bookData)
+                });
 
-            if (!response.ok) throw new Error('Error al crear libro personal');
-            return true;
-        } catch (error) {
-            actions.setMessage(error.message);
-            return false;
-        }
-    },
+                if (!response.ok) throw new Error('Error al crear libro personal');
+                return true;
+            } catch (error) {
+                actions.setMessage(error.message);
+                return false;
+            }
+        },
 
-    // Agregar a explore-bboks
-    addExploreFavorite: async (exploreBookId) => {
-        try {
-            const token = sessionStorage.getItem("token");
-            const response = await fetch(`${store.apiUrl}/api/favorites/explore`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify({ explore_book_id: exploreBookId })
-            });
+        // Agregar a explore-bboks
+        addExploreFavorite: async (exploreBookId) => {
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/favorites/explore`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ explore_book_id: exploreBookId })
+                });
 
-            if (!response.ok) throw new Error('Error al agregar a favoritos');
-            return true;
-        } catch (error) {
-            actions.setMessage(error.message);
-            return false;
-        }
-    }
+                if (!response.ok) throw new Error('Error al agregar a favoritos');
+                return true;
+            } catch (error) {
+                actions.setMessage(error.message);
+                return false;
+            }
+        },
+        // Obtener todos los Favoritos
+        getFavorites: async () => {
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/favorites`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al obtener favoritos');
+                
+                const data = await response.json();
+                return {
+                    success: data.success,
+                    count: data.count,
+                    favorites: data.favorites
+                };
+            } catch (error) {
+                actions.setMessage(error.message);
+                return {
+                    success: false,
+                    count: 0,
+                    favorites: []
+                };
+            }
+        },
     };
 
     return (
