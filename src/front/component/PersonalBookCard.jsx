@@ -1,7 +1,13 @@
+import { useGlobalReducer } from "../store/globalReducer";
+
 export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onViewDetails, Favorites }) => {
 
-    const isFavorite = Favorites?.favorites?.some(fav => 
-        fav.book?.title === book.title
+    const { store } = useGlobalReducer();
+
+     // Verifica si el libro está en favoritos
+    const isFavorite = store.favorites.some(fav => 
+        (fav.book_type === 'personal' && fav.personal_book_id === book.id) ||
+        (fav.book_type === 'explore' && fav.book?.title === book.title)
     );
     
 

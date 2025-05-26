@@ -33,6 +33,7 @@ const initialState = {
     // Estados para reviews
     reviews: [],
     currentBookReviews: [],
+    favorites: []
 };
 
 // Tipos de acciones
@@ -73,6 +74,8 @@ export const ACTIONS = {
     ADD_REVIEW: 'add_review',
     UPDATE_REVIEW: 'update_review',
     REMOVE_REVIEW: 'remove_review',
+
+    SET_FAVORITES: 'set_favorites',
 };
 
 // Reducer para manejar las acciones
@@ -181,6 +184,9 @@ function reducer(state, action) {
             return { ...state, isSeeding: action.payload };
         case ACTIONS.SET_SEEDING_PROGRESS:
             return { ...state, seedingProgress: action.payload };
+        // Favoritos
+        case ACTIONS.SET_FAVORITES:
+            return { ...state, favorites: action.payload };
         default:
             return state;
     }
@@ -1017,6 +1023,7 @@ export const GlobalProvider = ({ children }) => {
                 if (!response.ok) throw new Error('Error al obtener favoritos');
                 
                 const data = await response.json();
+                dispatch({ type: ACTIONS.SET_FAVORITES, payload: data.favorites });
                 return {
                     success: data.success,
                     count: data.count,

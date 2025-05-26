@@ -53,19 +53,12 @@ export const Library = () => {
             await actions.validateToken();
             setLoading(false);
         };
-        const checkFavoriteStatus = async () => {
-            if (!store.user) return;
-            
-            try {
-                const success = await actions.getFavorites();
-                if (success) {
-                    setIsFavorite(success)
-                }
-            } catch (error) {
-                console.error("Error checking favorites:", error);
+        const loadFavorites = async () => {
+            if (store.user) {
+                await actions.getFavorites();
             }
         };
-        checkFavoriteStatus();
+        loadFavorites();
         checkAuth();
         console.log(isFavorite);
     }, []);
