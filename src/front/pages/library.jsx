@@ -60,7 +60,6 @@ export const Library = () => {
         };
         loadFavorites();
         checkAuth();
-        console.log(isFavorite);
     }, []);
 
     // Cargar libros personales cuando el componente se monta

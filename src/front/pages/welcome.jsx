@@ -16,12 +16,19 @@ export const Welcome = () => {
     const [bookDetails, setBookDetails] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
-    // Verificar autenticación cuando el componente carga
+    // Verificar autenticación cuando el componente carga, Cargar Favoritos
     useEffect(() => {
         const checkAuth = async () => {
             await actions.validateToken();
             setLoading(false);
         };
+
+        const loadFavorites = async () => {
+            if (store.user) {
+                await actions.getFavorites();
+            }
+        };
+        loadFavorites();
 
         checkAuth();
     }, []);
