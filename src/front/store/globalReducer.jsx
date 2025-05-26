@@ -201,12 +201,6 @@ export const useGlobalReducer = () => {
     return context;
 };
 
-// Debug function to help with URL issues
-const logApiCall = (endpoint, url) => {
-    // console.log(`API call to ${endpoint}:`, url);
-    return url;
-};
-
 // Proveedor que envuelve la aplicación
 export const GlobalProvider = ({ children }) => {
     const [store, dispatch] = useReducer(reducer, initialState);
@@ -254,6 +248,7 @@ export const GlobalProvider = ({ children }) => {
 
     // Funciones de acción que serán utilizadas en los componentes
     const actions = {
+
         signup: async (email, password) => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
@@ -808,7 +803,6 @@ export const GlobalProvider = ({ children }) => {
             }
         },
 
-
         // ====== FUNCIONES PARA REVIEWS ======
 
         // Obtener reviews de un libro específico
@@ -989,7 +983,7 @@ export const GlobalProvider = ({ children }) => {
             }
         },
 
-        // Agregar a explore-bboks
+        // Agregar a explore-boks
         addExploreFavorite: async (exploreBookId) => {
             try {
                 const token = sessionStorage.getItem("token");
@@ -1009,6 +1003,7 @@ export const GlobalProvider = ({ children }) => {
                 return false;
             }
         },
+
         // Obtener todos los Favoritos
         getFavorites: async () => {
             try {

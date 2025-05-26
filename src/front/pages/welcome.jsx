@@ -28,8 +28,8 @@ export const Welcome = () => {
                 await actions.getFavorites();
             }
         };
+        
         loadFavorites();
-
         checkAuth();
     }, []);
 
@@ -46,6 +46,13 @@ export const Welcome = () => {
             navigate("/login");
         }
     }, [store.isAuthenticated, loading, navigate]);
+
+    // Cargar libros cuando cambia la página o los filtros
+    useEffect(() => {
+        if (store.isAuthenticated) {
+            actions.getBooks(store.currentPage, store.filters);
+        }
+    }, [store.currentPage, store.filters, store.isAuthenticated]);
 
     // Función para obtener detalles completos del libro
     const fetchBookDetails = async (bookId) => {

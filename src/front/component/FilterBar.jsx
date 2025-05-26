@@ -4,64 +4,68 @@ import { useGlobalReducer } from "../store/globalReducer";
 export const FilterBar = ({ bookType = "explore" }) => {
     const { store, actions, dispatch } = useGlobalReducer();
 
-    // Estados para los selectores de filtro y ordenamiento
+    // Estados para los selectores
     const [authorFilter, setAuthorFilter] = useState("");
     const [genreFilter, setGenreFilter] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
     const [sortBy, setSortBy] = useState("title");
     const [sortOrder, setSortOrder] = useState("asc");
+    const [showFavorites, setShowFavorites] = useState(false);
 
     // Listados únicos para los filtros
     const [uniqueAuthors, setUniqueAuthors] = useState([]);
     const [uniqueGenres, setUniqueGenres] = useState([]);
     const [uniqueCategories, setUniqueCategories] = useState([]);
 
-    // Determinar qué libros usar según el tipo
+    // Toggle para favoritos con actualización funcional
+    const toggleFavorites = () => {
+        setShowFavorites(prev => !prev);
+    };
+
+    // Obtener libros filtrados
     const getBooksData = () => {
         if (bookType === "personal") {
-            return store.personalBooks || [];
+            const personalBooks = store.personalBooks || [];
+            
+            if (showFavorites) {
+                const favoriteTitles = (store.favorites || []).map(fav => fav?.book?.title).filter(Boolean);
+                return personalBooks.filter(book => favoriteTitles.includes(book.title));
+            }
+            return personalBooks;
         }
         return store.books || [];
     };
 
-    // Obtener el nombre del autor según el tipo de libro
+    // Obtener nombre de autor según el tipo
     const getAuthorName = (book) => {
-        if (bookType === "personal") {
-            return book.author_name;
-        }
-        return book.author;
+        return bookType === "personal" ? book.author_name : book.author;
     };
 
-    // Extraer los valores únicos de los libros cuando cambian
+    // Actualizar listas únicas
     useEffect(() => {
         const booksData = getBooksData();
-
-        if (booksData && booksData.length > 0) {
-            // Extraer autores únicos
+        
+        if (booksData?.length > 0) {
             const authors = [...new Set(booksData.map(book => getAuthorName(book)).filter(Boolean))];
             setUniqueAuthors(authors.sort());
 
-            // Extraer géneros únicos
             const genres = [...new Set(booksData.map(book => book.genre).filter(Boolean))];
             setUniqueGenres(genres.sort());
 
-            // Extraer categorías únicas
             const categories = [...new Set(booksData.map(book => book.category).filter(Boolean))];
             setUniqueCategories(categories.sort());
         }
-    }, [bookType === "personal" ? store.personalBooks : store.books, bookType]);
+    }, [store.personalBooks, store.books, store.favorites, bookType, showFavorites]);
 
-    // Aplicar filtros
+    // Aplicar filtros al servidor
     const applyFilters = () => {
-        const filters = {
-            author: authorFilter,
-            genre: genreFilter,
-            category: categoryFilter
+        const filters = { 
+            author: authorFilter, 
+            genre: genreFilter, 
+            category: categoryFilter 
         };
-
         actions.setFilters(filters);
 
-        // Llamar a la función correcta según el tipo de libro
         if (bookType === "personal") {
             actions.getPersonalBooks(1, { ...store.filters, ...filters });
         } else {
@@ -69,17 +73,16 @@ export const FilterBar = ({ bookType = "explore" }) => {
         }
     };
 
-    // Limpiar filtros
+    // Limpiar todos los filtros
     const clearFilters = () => {
         setAuthorFilter("");
         setGenreFilter("");
         setCategoryFilter("");
         setSortBy("title");
         setSortOrder("asc");
-
+        setShowFavorites(false);
         actions.clearFilters();
 
-        // Llamar a la función correcta según el tipo de libro
         if (bookType === "personal") {
             actions.getPersonalBooks(1, {});
         } else {
@@ -87,50 +90,34 @@ export const FilterBar = ({ bookType = "explore" }) => {
         }
     };
 
-    // Aplicar ordenamiento
+    // Ordenar libros
     const applySort = () => {
         const booksData = getBooksData();
-        if (!booksData || booksData.length === 0) return;
+        if (!booksData?.length) return;
 
         const sortedBooks = [...booksData].sort((a, b) => {
-            let valueA = "";
-            let valueB = "";
-
-            if (sortBy === "author") {
-                valueA = getAuthorName(a)?.toLowerCase() || "";
-                valueB = getAuthorName(b)?.toLowerCase() || "";
-            } else {
-                valueA = a[sortBy]?.toLowerCase() || "";
-                valueB = b[sortBy]?.toLowerCase() || "";
-            }
-
-            if (sortOrder === "asc") {
-                return valueA.localeCompare(valueB);
-            } else {
-                return valueB.localeCompare(valueA);
-            }
+            const valueA = (sortBy === "author" ? getAuthorName(a) : a[sortBy])?.toLowerCase() || "";
+            const valueB = (sortBy === "author" ? getAuthorName(b) : b[sortBy])?.toLowerCase() || "";
+            
+            return sortOrder === "asc" 
+                ? valueA.localeCompare(valueB) 
+                : valueB.localeCompare(valueA);
         });
 
-        // Usar dispatch correctamente con el action type apropiado
-        if (bookType === "personal") {
-            dispatch({ type: 'set_personal_books', payload: sortedBooks });
-        } else {
-            dispatch({ type: 'set_books', payload: sortedBooks });
-        }
+        dispatch({
+            type: bookType === "personal" ? 'set_personal_books' : 'set_books',
+            payload: sortedBooks
+        });
     };
 
-    // Aplicar ordenamiento cuando cambian los parámetros de ordenamiento
     useEffect(() => {
-        const booksData = getBooksData();
-        if (booksData && booksData.length > 0) {
-            applySort();
-        }
-    }, [sortBy, sortOrder]);
+        applySort();
+    }, [sortBy, sortOrder, showFavorites]);
 
     return (
         <div className="filter-bar p-3 mb-4 rounded shadow-sm">
             <div className="d-flex flex-wrap align-items-end gap-3">
-                {/* Filtro por autor */}
+                {/* Filtro de Autor */}
                 <div className="filter-group">
                     <label htmlFor="author-filter" className="form-label">Autor</label>
                     <select
@@ -141,12 +128,12 @@ export const FilterBar = ({ bookType = "explore" }) => {
                     >
                         <option value="">Todos los autores</option>
                         {uniqueAuthors.map((author, index) => (
-                            <option key={index} value={author}>{author}</option>
+                            <option key={`author-${index}`} value={author}>{author}</option>
                         ))}
                     </select>
                 </div>
 
-                {/* Filtro por género */}
+                {/* Filtro de Género */}
                 <div className="filter-group">
                     <label htmlFor="genre-filter" className="form-label">Género</label>
                     <select
@@ -157,12 +144,12 @@ export const FilterBar = ({ bookType = "explore" }) => {
                     >
                         <option value="">Todos los géneros</option>
                         {uniqueGenres.map((genre, index) => (
-                            <option key={index} value={genre}>{genre}</option>
+                            <option key={`genre-${index}`} value={genre}>{genre}</option>
                         ))}
                     </select>
                 </div>
 
-                {/* Filtro por categoría */}
+                {/* Filtro de Categoría */}
                 <div className="filter-group">
                     <label htmlFor="category-filter" className="form-label">Categoría</label>
                     <select
@@ -173,12 +160,12 @@ export const FilterBar = ({ bookType = "explore" }) => {
                     >
                         <option value="">Todas las categorías</option>
                         {uniqueCategories.map((category, index) => (
-                            <option key={index} value={category}>{category}</option>
+                            <option key={`category-${index}`} value={category}>{category}</option>
                         ))}
                     </select>
                 </div>
 
-                {/* Ordenar por */}
+                {/* Ordenamiento */}
                 <div className="filter-group">
                     <label htmlFor="sort-by" className="form-label">Ordenar por</label>
                     <select
@@ -194,7 +181,6 @@ export const FilterBar = ({ bookType = "explore" }) => {
                     </select>
                 </div>
 
-                {/* Orden */}
                 <div className="filter-group">
                     <label htmlFor="sort-order" className="form-label">Orden</label>
                     <select
@@ -208,18 +194,23 @@ export const FilterBar = ({ bookType = "explore" }) => {
                     </select>
                 </div>
 
-                {/* Botones de acción */}
-                <div className="filter-actions mt-3 mt-md-0">
-                    <button
-                        className="btn btn-primary me-2"
-                        onClick={applyFilters}
-                    >
-                        <i className="fa-solid fa-filter me-1"></i> Aplicar Filtros
+                {/* Botones de Acción */}
+                <div className="filter-actions mt-3 mt-md-0 d-flex gap-2">
+                    {bookType === "personal" && (
+                        <button 
+                            className={`btn ${showFavorites ? 'btn-warning' : 'btn-outline-warning'}`}
+                            onClick={toggleFavorites}
+                        >
+                            <i className={`fa-solid fa-star ${showFavorites ? 'text-white' : ''}`}></i>
+                            {showFavorites ? " Mostrar Todos" : " Solo Favoritos"}
+                        </button>
+                    )}
+                    
+                    <button className="btn btn-primary" onClick={applyFilters}>
+                        <i className="fa-solid fa-filter me-1"></i> Aplicar
                     </button>
-                    <button
-                        className="btn btn-secondary"
-                        onClick={clearFilters}
-                    >
+                    
+                    <button className="btn btn-secondary" onClick={clearFilters}>
                         <i className="fa-solid fa-broom me-1"></i> Limpiar
                     </button>
                 </div>
