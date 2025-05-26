@@ -69,12 +69,16 @@ export const BookCard = ({ book, onViewDetails }) => {
                 )}
             </div>
             
-            <div className="book-info mt-3">
+            <div className="book-info mt-3" style={{ minWidth: 0 }}>
                 <h5 className="book-title text-truncate">{book.title}</h5>
                 <p className="book-author mb-1 text-truncate">{book.author}</p>
-                <div className="book-meta d-flex flex-wrap gap-1 mt-2">
-                    <span className="badge bg-primary">{book.genre}</span>
-                    <span className="badge bg-secondary">{book.category}</span>
+                <div className="book-meta d-flex flex-wrap gap-1 mt-2" style={{ overflow: "hidden" }}>
+                    <span className="badge bg-primary text-truncate" style={{ maxWidth: "100%" }}>
+                        {book.genre}
+                    </span>
+                    <span className="badge bg-secondary text-truncate" style={{ maxWidth: "100%" }}>
+                        {book.category}
+                    </span>
                 </div>
             </div>
         </div>
