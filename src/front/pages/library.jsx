@@ -320,8 +320,8 @@ export const Library = () => {
             });
 
             if (!response.ok) throw new Error('Error fetching details');
-            const data = await response.json(); 
-            
+            const data = await response.json();
+
             setBookDetails(data);
         } catch (error) {
             actions.setMessage("Error al cargar detalles: " + error.message);
@@ -362,6 +362,11 @@ export const Library = () => {
                         </div>
                     </div>
                     <div className="d-flex gap-3">
+                        <Link to="/stats" className="btn btn-outline-info btn-lg">
+                            <i className="fa-solid fa-chart-bar me-2"></i>
+                            Mis Estadísticas
+                        </Link>
+
                         {/* Botón para ver los libros de otros usuarios */}
                         <Link to="/other-books" className="btn btn-outline-light btn-lg">
                             <i className="fa-solid fa-users me-2"></i>

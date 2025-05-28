@@ -36,28 +36,30 @@ export const Navbar = () => {
 				{/* Barra de búsqueda (solo visible cuando está autenticado) */}
 				{store.isAuthenticated && <SearchBar />}
 
-				<div className="btn-group shadow-0 w-auto" role="group" aria-label="User Actions">
-					{store.isAuthenticated && (
-						<button 
-							className="btn btn-warning mt-3"
+				{/* Botón de sembrar base de datos (solo cuando está autenticado) */}
+				{store.isAuthenticated && (
+					<div className="btn-group shadow-0 w-auto" role="group" aria-label="Database Actions">
+						<button
+							className="btn btn-warning"
 							onClick={handleSeedDatabase}
 							disabled={store.isSeeding}
 						>
 							{store.isSeeding ? (
 								<>
 									<span className="spinner-border spinner-border-sm" role="status"></span>
-									Sembrando... {store.seedingProgress}%
+									<span className="ms-2">Sembrando... {store.seedingProgress}%</span>
 								</>
 							) : (
 								<>
 									<i className="fa-solid fa-database me-2"></i>
-									Poblar Base de Datos
+									<span className="text-span">Poblar Base de Datos</span>
 								</>
 							)}
 						</button>
-					)}
-				</div>
+					</div>
+				)}
 
+				{/* Navegación principal */}
 				<div className="btn-group shadow-0 w-auto" role="group" aria-label="Main Navigation">
 					{!store.isAuthenticated ? (
 						<>
@@ -65,18 +67,26 @@ export const Navbar = () => {
 								<i className="fa-solid fa-house me-1"></i>
 								<span className="text-span">Inicio</span>
 							</Link>
-							<button onClick={() => scrollToSection('features-section')} className="btn btn-outline-light features-btn">
-								<i className="fa-solid fa-star me-1"></i>
-								<span className="text-span">Características</span>
-							</button>
-							<button onClick={() => scrollToSection('how-it-works-section')} className="btn btn-outline-light how-it-works-btn">
+							<Link to="/features" className="btn btn-outline-light features-btn">
+								<i className="fa-solid fa-rocket me-1"></i>
+								<span className="text-span">Funcionalidades</span>
+							</Link>
+							<Link to="/about" className="btn btn-outline-light about-btn">
+								<i className="fa-solid fa-users me-1"></i>
+								<span className="text-span">Sobre Nosotros</span>
+							</Link>
+							<Link to="/help" className="btn btn-outline-light help-btn">
 								<i className="fa-solid fa-question-circle me-1"></i>
-								<span className="text-span">Cómo Funciona</span>
-							</button>
-							<button onClick={() => scrollToSection('testimonials-section')} className="btn btn-outline-light testimonials-btn">
-								<i className="fa-solid fa-comments me-1"></i>
-								<span className="text-span">Testimonios</span>
-							</button>
+								<span className="text-span">Ayuda</span>
+							</Link>
+							<Link to="/terms" className="btn btn-outline-light terms-btn">
+								<i className="fa-solid fa-file-contract me-1"></i>
+								<span className="text-span">Términos</span>
+							</Link>
+							<Link to="/privacy" className="btn btn-outline-light privacy-btn">
+								<i className="fa-solid fa-shield-alt me-1"></i>
+								<span className="text-span">Privacidad</span>
+							</Link>
 						</>
 					) : (
 						<>
@@ -91,6 +101,8 @@ export const Navbar = () => {
 						</>
 					)}
 				</div>
+
+				{/* Acciones de usuario */}
 				<div className="btn-group shadow-0 w-auto ms-2" role="group" aria-label="User Actions">
 					{!store.isAuthenticated ? (
 						<>

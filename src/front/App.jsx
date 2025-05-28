@@ -6,7 +6,13 @@ import { Login } from "./pages/login";
 import { Signup } from "./pages/signup";
 import { Welcome } from "./pages/welcome";
 import { Library } from "./pages/library";
-import { OtherBooks } from "./pages/OtherBooks"; // Importar la nueva página
+import { OtherBooks } from "./pages/OtherBooks";
+import { Terms } from "./pages/Terms";
+import { About } from "./pages/About";
+import { Features } from "./pages/Features";
+import { Help } from "./pages/Help";
+import { Privacy } from "./pages/Privacy";
+import { Stats } from "./pages/Stats";
 import { NotFound } from "./pages/notFound";
 import { Navbar } from "./component/Navbar";
 import { Footer } from "./component/Footer";
@@ -33,9 +39,17 @@ const App = () => {
                     <ScrollToTop>
                         <Navbar />
                         <Routes>
+                            {/* Rutas públicas */}
                             <Route path="/" element={<Home />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/signup" element={<Signup />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/features" element={<Features />} />
+                            <Route path="/help" element={<Help />} />
+                            <Route path="/terms" element={<Terms />} />
+                            <Route path="/privacy" element={<Privacy />} />
+
+                            {/* Rutas protegidas */}
                             <Route path="/welcome" element={
                                 <ProtectedRoute>
                                     <Welcome />
@@ -51,6 +65,13 @@ const App = () => {
                                     <OtherBooks />
                                 </ProtectedRoute>
                             } />
+                            <Route path="/stats" element={
+                                <ProtectedRoute>
+                                    <Stats />
+                                </ProtectedRoute>
+                            } />
+
+                            {/* Ruta 404 */}
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                         <Footer />
