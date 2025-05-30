@@ -1,11 +1,12 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
+import { UserAdminModal } from "./UserAdminModal";
 import { SearchBar } from "./SearchBar";
 
 export const Navbar = () => {
 	const { store, actions } = useGlobalReducer();
 	const navigate = useNavigate();
-
+	
 	const handleLogout = () => {
 		actions.logout();
 		navigate("/login");
@@ -36,8 +37,22 @@ export const Navbar = () => {
 				{/* Barra de búsqueda (solo visible cuando está autenticado) */}
 				{store.isAuthenticated && <SearchBar />}
 
+				{store.user?.rol === 1 && (
+					<>
+						<button
+							className="btn btn-outline-info ms-2"
+							data-bs-toggle="modal"
+							data-bs-target="#userAdminModal"
+						>
+							<i className="fa-solid fa-users-gear me-1"></i>
+							<span className="text-span">Administrar Usuarios</span>
+						</button>
+						<UserAdminModal />
+					</>
+				)}
+
 				{/* Botón de sembrar base de datos (solo cuando está autenticado) */}
-				{store.isAuthenticated && (
+				{/* {store.isAuthenticated && (
 					<div className="btn-group shadow-0 w-auto" role="group" aria-label="Database Actions">
 						<button
 							className="btn btn-warning"
@@ -57,7 +72,7 @@ export const Navbar = () => {
 							)}
 						</button>
 					</div>
-				)}
+				)} */}
 
 				{/* Navegación principal */}
 				<div className="btn-group shadow-0 w-auto" role="group" aria-label="Main Navigation">

@@ -233,11 +233,9 @@ export const GlobalProvider = ({ children }) => {
                         dispatch({ type: ACTIONS.SET_AUTHENTICATED, payload: true });
                     } else {
                         // Token inválido o expirado
-                        // console.log("Token validation failed:", response.status);
                         sessionStorage.removeItem("token");
                     }
                 } catch (error) {
-                    // console.error("Error validating token on load:", error);
                     sessionStorage.removeItem("token");
                 }
             }

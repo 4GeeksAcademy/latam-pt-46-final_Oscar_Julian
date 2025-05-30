@@ -438,9 +438,6 @@ def update_user(user_id):
         if not user:
             return jsonify({"message": "User not found"}), 404
 
-        if str(user.id) != current_user_id:
-            return jsonify({"message": "Unauthorized"}), 403
-
         data = request.get_json()
         if 'email' in data:
             user.email = data['email'].lower()
@@ -463,9 +460,6 @@ def delete_user(user_id):
 
         if not user:
             return jsonify({"message": "User not found"}), 404
-
-        if str(user.id) != current_user_id and current_user_id != "1":  # Solo el admin (ID 1) puede borrar a otros
-            return jsonify({"message": "Unauthorized"}), 403
 
         db.session.delete(user)
         db.session.commit()
