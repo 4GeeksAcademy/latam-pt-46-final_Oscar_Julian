@@ -454,6 +454,26 @@ def update_user(user_id):
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
+@api.route('/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+    try:
+        current_user_id = get_jwt_identity()
+        user = User.query.get(user_id)
+
+        if not user:
+            return jsonify({"message": "User not found"}), 404
+
+        if str(user.id) != current_user_id and current_user_id != "1":  # Solo el admin (ID 1) puede borrar a otros
+            return jsonify({"message": "Unauthorized"}), 403
+
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": "User deleted"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"message": f"Error: {str(e)}"}), 500
 
 #  --------------------------------------------- REVIEWS ---------------------------------------------------------------------
 
