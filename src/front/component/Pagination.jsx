@@ -6,8 +6,6 @@ export const Pagination = () => {
     const { totalBooks, booksPerPage, currentPage } = store;
 
     const totalPages = Math.ceil(totalBooks / booksPerPage);
-    console.log(totalPages, totalBooks, booksPerPage);
-    
 
     // Generar el rango de páginas a mostrar
     const getPageRange = () => {

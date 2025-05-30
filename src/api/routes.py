@@ -15,7 +15,6 @@ CORS(api,
      allow_headers=["Content-Type", "Authorization"],
      supports_credentials=True)
 
-
 @api.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
@@ -38,7 +37,6 @@ def after_request(response):
     return response
 
 #  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------
-
 
 @api.route('/signup', methods=['POST'])
 def signup():
@@ -455,6 +453,7 @@ def update_user(user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
+
 
 #  --------------------------------------------- REVIEWS ---------------------------------------------------------------------
 

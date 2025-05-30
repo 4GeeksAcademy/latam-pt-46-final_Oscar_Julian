@@ -11,6 +11,7 @@ class User(db.Model):
     email = db.Column(db.Text, nullable=False, unique=True)
     password = db.Column(db.Text, nullable=False)
     is_active = db.Column(db.Boolean, default=True)
+    rol = db.Column(db.Integer, default=0)
     explore_books = db.relationship(
         "ExploreBook", back_populates="created_by_user")
     personal_books = db.relationship(
