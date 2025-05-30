@@ -19,7 +19,7 @@ const initialState = {
     totalPersonalBooks: 0,
     // Estados compartidos
     currentPage: 1,
-    booksPerPage: 7,
+    booksPerPage: 100,
     filters: {
         search: "",
         author: "",
@@ -701,57 +701,57 @@ export const GlobalProvider = ({ children }) => {
         },
 
         // Modificar getPersonalBooks para que solo obtenga los libros del usuario actual
-        getPersonalBooks: async (page = 1, filters = {}) => {
-            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+        // getPersonalBooks: async (page = 1, filters = {}) => {
+        //     dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
-            try {
-                const current_user_id = store.user ? store.user.id : null;
-                if (!current_user_id) {
-                    throw new Error('User not authenticated');
-                }
+        //     try {
+        //         const current_user_id = store.user ? store.user.id : null;
+        //         if (!current_user_id) {
+        //             throw new Error('User not authenticated');
+        //         }
 
-                // Construir parámetros de consulta para paginación y filtros
-                const queryParams = new URLSearchParams();
-                if (page) queryParams.append('page', page);
-                Object.entries(filters).forEach(([key, value]) => {
-                    if (value) queryParams.append(key, value);
-                });
+        //         // Construir parámetros de consulta para paginación y filtros
+        //         const queryParams = new URLSearchParams();
+        //         if (page) queryParams.append('page', page);
+        //         Object.entries(filters).forEach(([key, value]) => {
+        //             if (value) queryParams.append(key, value);
+        //         });
 
-                const apiUrl = `${store.apiUrl}/api/personal-books?${queryParams.toString()}`;
-                const token = sessionStorage.getItem("token");
+        //         const apiUrl = `${store.apiUrl}/api/personal-books?${queryParams.toString()}`;
+        //         const token = sessionStorage.getItem("token");
 
-                const response = await fetch(apiUrl, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
+        //         const response = await fetch(apiUrl, {
+        //             method: "GET",
+        //             headers: {
+        //                 "Authorization": `Bearer ${token}`
+        //             }
+        //         });
 
-                if (!response.ok) {
-                    throw new Error('Error fetching personal books');
-                }
+        //         if (!response.ok) {
+        //             throw new Error('Error fetching personal books');
+        //         }
 
-                const data = await response.json();
+        //         const data = await response.json();
 
-                // Filtrar para mostrar solo los libros del usuario actual
-                const userBooks = data.data ? data.data.filter(book => book.created_by === current_user_id) : [];
+        //         // Filtrar para mostrar solo los libros del usuario actual
+        //         const userBooks = data.data ? data.data.filter(book => book.created_by === current_user_id) : [];
 
-                dispatch({ type: ACTIONS.SET_PERSONAL_BOOKS, payload: userBooks });
-                dispatch({ type: ACTIONS.SET_TOTAL_PERSONAL_BOOKS, payload: userBooks.length });
-                dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
-                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+        //         dispatch({ type: ACTIONS.SET_PERSONAL_BOOKS, payload: userBooks });
+        //         dispatch({ type: ACTIONS.SET_TOTAL_PERSONAL_BOOKS, payload: userBooks.length });
+        //         dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
+        //         dispatch({ type: ACTIONS.SET_LOADING, payload: false });
 
-                return userBooks;
-            } catch (error) {
-                // console.error("Error fetching personal books:", error);
-                dispatch({
-                    type: ACTIONS.SET_MESSAGE,
-                    payload: "Error al cargar tus libros. Por favor, intenta más tarde."
-                });
-                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-                return [];
-            }
-        },
+        //         return userBooks;
+        //     } catch (error) {
+        //         // console.error("Error fetching personal books:", error);
+        //         dispatch({
+        //             type: ACTIONS.SET_MESSAGE,
+        //             payload: "Error al cargar tus libros. Por favor, intenta más tarde."
+        //         });
+        //         dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+        //         return [];
+        //     }
+        // },
 
         // Siembra de Libros
         seedBooks: async () => {

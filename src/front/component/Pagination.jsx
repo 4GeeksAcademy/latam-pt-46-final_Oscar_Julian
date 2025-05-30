@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect } from "react";
 import { useGlobalReducer } from "../store/globalReducer";
 
 export const Pagination = () => {
@@ -6,6 +6,8 @@ export const Pagination = () => {
     const { totalBooks, booksPerPage, currentPage } = store;
 
     const totalPages = Math.ceil(totalBooks / booksPerPage);
+    console.log(totalPages, totalBooks, booksPerPage);
+    
 
     // Generar el rango de páginas a mostrar
     const getPageRange = () => {
@@ -26,7 +28,9 @@ export const Pagination = () => {
     // Cambiar de página
     const handlePageChange = (newPage) => {
         if (newPage < 1 || newPage > totalPages) return;
-
+        if (newPage >= totalPages) newPage = totalPages;
+        console.log(newPage, totalPages);
+        
         actions.changePage(newPage);
         actions.getBooks(newPage, store.filters);
 
