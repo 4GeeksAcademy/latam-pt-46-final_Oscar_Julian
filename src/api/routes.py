@@ -362,10 +362,17 @@ def get_other_users_books():
             if book.created_by not in books_by_user:
                 # Obtener información del usuario
                 user = User.query.get(book.created_by)
-                user_email = user.email if user else "Usuario desconocido"
+                if user:
+                    # Extraer el nombre de usuario (parte antes del @)
+                    username = user.email.split(
+                        '@')[0].capitalize() if '@' in user.email else user.email.capitalize()
+                else:
+                    username = "Usuario desconocido"
+
                 books_by_user[book.created_by] = {
                     "user_id": book.created_by,
-                    "user_email": user_email,
+                    "user_email": user.email if user else "email@desconocido.com",
+                    "username": username,  # Nuevo campo con el nombre de usuario
                     "books": []
                 }
 
@@ -496,7 +503,25 @@ def get_book_reviews(book_id):
             return jsonify({"message": "Personal book not found"}), 404
 
         reviews = Review.query.filter_by(book_id=book_id).all()
-        return jsonify([review.serialize() for review in reviews]), 200
+
+        # Serializar las reviews incluyendo el username del autor
+        serialized_reviews = []
+        for review in reviews:
+            review_data = review.serialize()
+
+            # Obtener el usuario que escribió la review
+            user = User.query.get(review.user_id)
+            if user:
+                # Extraer el nombre de usuario (parte antes del @)
+                username = user.email.split(
+                    '@')[0].capitalize() if '@' in user.email else user.email.capitalize()
+                review_data['username'] = username
+            else:
+                review_data['username'] = "Usuario desconocido"
+
+            serialized_reviews.append(review_data)
+
+        return jsonify(serialized_reviews), 200
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
 

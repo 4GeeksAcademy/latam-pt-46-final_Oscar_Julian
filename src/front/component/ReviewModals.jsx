@@ -130,7 +130,7 @@ export const ViewReviewsModal = ({
                                             <div className="review-header">
                                                 <strong className="text-primary">
                                                     <i className="fa-solid fa-user me-1"></i>
-                                                    Usuario #{review.user_id}
+                                                    {review.username || `Usuario desconocido`}
                                                 </strong>
                                                 <div className="review-rating mt-1">
                                                     <span className="text-warning">

@@ -124,7 +124,7 @@ export const OtherBooks = () => {
                             >
                                 <h3 className="user-email mb-3">
                                     <i className="fa-solid fa-user me-2"></i>
-                                    Libros de: {userData.user_email}
+                                    Libros de: {userData.username || userData.user_email.split('@')[0].charAt(0).toUpperCase() + userData.user_email.split('@')[0].slice(1)}
                                 </h3>
                                 {userData.books && userData.books.length > 0 ? (
                                     <div className="books-grid">

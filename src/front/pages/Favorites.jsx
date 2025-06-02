@@ -74,6 +74,28 @@ export const Favorites = () => {
         setShowDetailModal(true);
     };
 
+    // Función para filtrar favoritos usando solo la búsqueda del SearchBar
+    const getFilteredFavorites = () => {
+        if (!store.favorites || store.favorites.length === 0) return [];
+
+        return store.favorites.filter(favorite => {
+            const book = favorite.book;
+            if (!book) return false;
+
+            // Aplicar solo el filtro de búsqueda (del SearchBar del navbar)
+            if (store.filters.search) {
+                const searchTerm = store.filters.search.toLowerCase();
+                const titleMatch = book.title?.toLowerCase().includes(searchTerm);
+                const authorMatch = book.author_name?.toLowerCase().includes(searchTerm);
+                if (!titleMatch && !authorMatch) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    };
+
     // Mostrar estado de carga
     if (loading) {
         return (
@@ -91,6 +113,7 @@ export const Favorites = () => {
     }
 
     const favorites = store.favorites || [];
+    const filteredFavorites = getFilteredFavorites();
 
     return (
         <div className="book-library-container">
@@ -139,9 +162,9 @@ export const Favorites = () => {
                             <span className="visually-hidden">Cargando favoritos...</span>
                         </div>
                     </div>
-                ) : favorites.length > 0 ? (
+                ) : filteredFavorites.length > 0 ? (
                     <div className="books-grid">
-                        {favorites.map((favorite, index) => (
+                        {filteredFavorites.map((favorite, index) => (
                             <div
                                 key={favorite.id}
                                 className="book-appear"
@@ -155,7 +178,23 @@ export const Favorites = () => {
                             </div>
                         ))}
                     </div>
+                ) : favorites.length > 0 ? (
+                    // Hay favoritos pero no coinciden con la búsqueda
+                    <div className="empty-library">
+                        <i className="fa-solid fa-search text-warning" style={{ fontSize: '4rem' }}></i>
+                        <h3>No se encontraron favoritos</h3>
+                        <p>
+                            No hay favoritos que coincidan con tu búsqueda.
+                        </p>
+                        <div className="d-flex gap-3 mt-4 justify-content-center">
+                            <Link to="/welcome" className="btn btn-primary">
+                                <i className="fa-solid fa-search me-2"></i>
+                                Explorar Biblioteca
+                            </Link>
+                        </div>
+                    </div>
                 ) : (
+                    // No hay favoritos en absoluto
                     <div className="empty-library">
                         <i className="fa-solid fa-heart-crack text-danger" style={{ fontSize: '4rem' }}></i>
                         <h3>No tienes favoritos aún</h3>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
 import { UserAdminModal } from "./UserAdminModal";
 import { SearchBar } from "./SearchBar";
@@ -6,6 +6,7 @@ import { SearchBar } from "./SearchBar";
 export const Navbar = () => {
 	const { store, actions } = useGlobalReducer();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const handleLogout = () => {
 		actions.logout();
@@ -27,6 +28,10 @@ export const Navbar = () => {
 		}
 	};
 
+	// Definir las rutas donde se debe mostrar el SearchBar
+	const searchBarRoutes = ['/welcome', '/library', '/favorites'];
+	const shouldShowSearchBar = store.isAuthenticated && searchBarRoutes.includes(location.pathname);
+
 	return (
 		<nav className="navbar justify-content-center p-4 navigator">
 			<div className="container d-flex justify-content-between align-items-center">
@@ -34,8 +39,8 @@ export const Navbar = () => {
 					<img className="img-fluid" src="https://www.ellibrototal.com/estaticosED/files/img/ltotalLogo2.svg" alt="Logo de El Libro Total" style={{ height: '40px' }} />
 				</Link>
 
-				{/* Barra de búsqueda (solo visible cuando está autenticado) */}
-				{store.isAuthenticated && <SearchBar />}
+				{/* Barra de búsqueda (solo visible en rutas específicas cuando está autenticado) */}
+				{shouldShowSearchBar && <SearchBar />}
 
 				{store.user?.rol === 1 && (
 					<>
@@ -109,11 +114,19 @@ export const Navbar = () => {
 								<i className="fa-solid fa-heart me-1 text-danger"></i>
 								<span className="text-span">Favoritos</span>
 							</Link>
-							<Link to="/welcome" className="btn btn-outline-light home-btn">
+							<Link className="btn btn-outline-light home-btn" to="/stats">
+								<i className="fa-solid fa-chart-bar me-2"></i>
+								<span className="text-span">Estadisticas</span>
+							</Link>
+							<Link className="btn btn-outline-light home-btn" to="/other-books">
+								<i className="fa-solid fa-users me-2"></i>
+								<span className="text-span">Otros Libros</span>
+							</Link>
+							<Link className="btn btn-outline-light home-btn" to="/welcome">
 								<i className="fa-solid fa-magnifying-glass-plus"></i>
 								<span className="text-span">Explorar</span>
 							</Link>
-							<Link to="/library" className="btn btn-outline-light home-btn">
+							<Link className="btn btn-outline-light home-btn" to="/library">
 								<i className="fa-solid fa-book me-1"></i>
 								<span className="text-span">Mi Biblioteca</span>
 							</Link>
