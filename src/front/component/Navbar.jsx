@@ -33,8 +33,8 @@ export const Navbar = () => {
 	const shouldShowSearchBar = store.isAuthenticated && searchBarRoutes.includes(location.pathname);
 
 	return (
-		<nav className="navbar justify-content-center p-4 navigator">
-			<div className="container d-flex justify-content-between align-items-center">
+		<nav className="navbar justify-content-center p-2 p-md-4 navigator">
+			<div className="container-fluid d-flex flex-column flex-lg-row justify-content-between align-items-center gap-2 gap-lg-0">
 				<Link to={!store.isAuthenticated ? "/" : "/welcome"} className="navbar-brand">
 					<img className="img-fluid" src="https://www.ellibrototal.com/estaticosED/files/img/ltotalLogo2.svg" alt="Logo de El Libro Total" style={{ height: '40px' }} />
 				</Link>
@@ -135,7 +135,7 @@ export const Navbar = () => {
 				</div>
 
 				{/* Acciones de usuario */}
-				<div className="btn-group shadow-0 w-auto ms-2" role="group" aria-label="User Actions">
+				<div className="btn-group shadow-0 w-auto ms-0 ms-lg-2 mt-2 mt-lg-0" role="group" aria-label="User Actions">
 					{!store.isAuthenticated ? (
 						<>
 							<Link to="/login" className="btn btn-outline-light login-btn">

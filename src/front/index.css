@@ -16,6 +16,7 @@ body {
   font-family: "Lato", "Arial", sans-serif;
   color: var(--dark-text);
   background-color: var(--background);
+  overflow-x: hidden; /* Prevenir scroll horizontal */
 }
 
 a {
@@ -29,29 +30,137 @@ a:hover {
   text-decoration: none;
 }
 
-/* Navbar */
-.navigator {
-  background-color: var(--background);
+/* Container responsive */
+.container {
+  max-width: 100%;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
-/* Hero Section */
+@media (min-width: 576px) {
+  .container {
+    max-width: 540px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1140px;
+  }
+}
+
+/* Navbar responsive */
+.navigator {
+  background-color: var(--background);
+  padding: 1rem;
+}
+
+@media (max-width: 991.98px) {
+  .navigator .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .navigator .btn-group {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .navigator .btn {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .navigator .btn .text-span {
+    display: none !important;
+  }
+
+  .navigator .btn {
+    width: auto;
+    min-width: 40px;
+    padding: 0.5rem;
+  }
+}
+
+/* SearchBar responsive */
+.search-bar {
+  flex-grow: 1;
+  max-width: 100%;
+}
+
+@media (max-width: 767.98px) {
+  .search-bar {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}
+
+/* Hero Section responsive */
 .hero-section {
   background-color: var(--light-accent);
-  padding: 100px 0;
+  padding: 60px 0;
   position: relative;
   overflow: hidden;
 }
 
 .hero-section h1 {
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: var(--primary-dark);
+  text-align: center;
 }
 
 .hero-section .lead {
-  font-size: 1.25rem;
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
   margin-bottom: 2rem;
+  text-align: center;
+}
+
+@media (min-width: 992px) {
+  .hero-section {
+    padding: 100px 0;
+  }
+
+  .hero-section h1,
+  .hero-section .lead {
+    text-align: left;
+  }
+}
+
+.hero-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+@media (min-width: 576px) {
+  .hero-buttons {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+@media (min-width: 992px) {
+  .hero-buttons {
+    justify-content: flex-start;
+  }
 }
 
 .hero-buttons .btn-primary {
@@ -60,6 +169,14 @@ a:hover {
   border-radius: 25px;
   padding: 10px 25px;
   transition: all 0.3s ease;
+  width: 100%;
+  max-width: 250px;
+}
+
+@media (min-width: 576px) {
+  .hero-buttons .btn-primary {
+    width: auto;
+  }
 }
 
 .hero-buttons .btn-primary:hover {
@@ -71,24 +188,39 @@ a:hover {
 .hero-image {
   position: relative;
   z-index: 1;
+  margin-top: 2rem;
 }
 
-/* Features Section */
+@media (min-width: 992px) {
+  .hero-image {
+    margin-top: 0;
+  }
+}
+
+/* Features Section responsive */
 .features-section {
   background-color: var(--background);
-  padding: 80px 0;
+  padding: 60px 0;
+}
+
+@media (min-width: 768px) {
+  .features-section {
+    padding: 80px 0;
+  }
 }
 
 .section-header h2 {
   color: var(--primary-dark);
   font-weight: 700;
   margin-bottom: 1rem;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .section-header .lead {
   color: var(--dark-text);
   max-width: 700px;
   margin: 0 auto;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
 }
 
 .feature-card {
@@ -96,6 +228,14 @@ a:hover {
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .feature-card {
+    padding: 1.5rem;
+  }
 }
 
 .feature-card:hover {
@@ -111,17 +251,31 @@ a:hover {
   color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 1rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
 }
 
-/* How It Works Section */
+/* How It Works Section responsive */
 .how-it-works-section {
   background-color: var(--card-bg);
-  padding: 80px 0;
+  padding: 60px 0;
+}
+
+@media (min-width: 768px) {
+  .how-it-works-section {
+    padding: 80px 0;
+  }
 }
 
 .step {
   display: flex;
   align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 992px) {
+  .step {
+    margin-bottom: 1.5rem;
+  }
 }
 
 .step-number {
@@ -136,18 +290,38 @@ a:hover {
   font-weight: 600;
   margin-right: 1rem;
   flex-shrink: 0;
+  font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+  .step-number {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
 }
 
 .step-content h3 {
   color: var(--primary-dark);
   font-weight: 600;
   margin-bottom: 0.5rem;
+  font-size: clamp(1.1rem, 2.5vw, 1.25rem);
 }
 
-/* Testimonials Section */
+.step-content p {
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+/* Testimonials Section responsive */
 .testimonials-section {
   background-color: var(--background);
-  padding: 80px 0;
+  padding: 60px 0;
+}
+
+@media (min-width: 768px) {
+  .testimonials-section {
+    padding: 80px 0;
+  }
 }
 
 .testimonial-card {
@@ -155,11 +329,19 @@ a:hover {
   border-radius: 10px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
   height: 100%;
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .testimonial-card {
+    padding: 1.5rem;
+  }
 }
 
 .testimonial-content {
   font-style: italic;
   position: relative;
+  font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
 .testimonial-content p {
@@ -169,7 +351,7 @@ a:hover {
 
 .testimonial-content::before {
   content: "";
-  font-size: 4rem;
+  font-size: clamp(2rem, 5vw, 4rem);
   position: absolute;
   top: -20px;
   left: -15px;
@@ -181,22 +363,39 @@ a:hover {
 .testimonial-author h5 {
   color: var(--primary-dark);
   font-weight: 600;
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
 }
 
-/* CTA Section */
+/* CTA Section responsive */
 .cta-section {
   background-color: var(--accent);
+  padding: 60px 0;
+}
+
+@media (min-width: 768px) {
+  .cta-section {
+    padding: 80px 0;
+  }
 }
 
 .cta-content {
   background-color: var(--card-bg);
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+@media (min-width: 768px) {
+  .cta-content {
+    padding: 3rem;
+  }
 }
 
 .cta-content h2 {
   color: var(--primary-dark);
   font-weight: 700;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 1rem;
 }
 
 .cta-content .btn-primary {
@@ -206,6 +405,16 @@ a:hover {
   padding: 12px 30px;
   font-weight: 600;
   transition: all 0.3s ease;
+  margin: 0.5rem;
+  width: 100%;
+  max-width: 250px;
+}
+
+@media (min-width: 576px) {
+  .cta-content .btn-primary {
+    width: auto;
+    margin: 0.5rem;
+  }
 }
 
 .cta-content .btn-primary:hover {
@@ -214,7 +423,7 @@ a:hover {
   color: #0b1c2b;
 }
 
-/* Animaciones */
+/* Animaciones responsivas */
 .fade-in {
   animation: fadeIn 1.2s ease-in-out;
 }
@@ -274,39 +483,17 @@ a:hover {
   }
 }
 
-/* Responsive Styles */
-@media (max-width: 991.98px) {
-  .hero-section {
-    padding: 60px 0;
-  }
-
-  .hero-section h1 {
-    font-size: 2.5rem;
-  }
-
-  .hero-image {
-    margin-top: 2rem;
-  }
-}
-
-@media (max-width: 767.98px) {
-  .hero-section h1 {
-    font-size: 2rem;
-  }
-
-  .how-it-works-section .steps {
-    margin-top: 2rem;
-  }
-}
-
+/* Textos responsivos en navbar */
 .text-span {
   display: none;
   opacity: 0;
 }
 
-.btn:hover .text-span {
-  display: inline;
-  animation: show-animation 1000ms forwards;
+@media (min-width: 992px) {
+  .btn:hover .text-span {
+    display: inline;
+    animation: show-animation 1000ms forwards;
+  }
 }
 
 @keyframes show-animation {
@@ -318,22 +505,51 @@ a:hover {
   }
 }
 
-/* Estilos para la biblioteca de libros */
+/* Biblioteca de libros responsive */
 .book-library-container {
   min-height: calc(100vh - 200px);
-  padding: 30px 0;
+  padding: 15px 0;
+}
+
+@media (min-width: 768px) {
+  .book-library-container {
+    padding: 30px 0;
+  }
 }
 
 .library-heading {
   color: var(--primary-dark);
   margin-bottom: 1.5rem;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
 
+/* Grid de libros completamente responsive */
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
   margin-bottom: 40px;
+}
+
+@media (min-width: 480px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (min-width: 768px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 25px;
+  }
+}
+
+@media (min-width: 992px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+  }
 }
 
 .book-card {
@@ -352,6 +568,7 @@ a:hover {
   background-color: #f0f0f0;
   overflow: hidden;
   border-radius: 5px;
+  width: 100%;
 }
 
 .book-cover img {
@@ -371,50 +588,200 @@ a:hover {
   background-color: #e1e1e1;
   color: #777;
   font-style: italic;
-  padding: 20px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+}
+
+@media (min-width: 768px) {
+  .no-cover-placeholder {
+    padding: 20px;
+  }
 }
 
 .book-info {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
+  padding: 0.5rem 0;
+}
+
+@media (min-width: 768px) {
+  .book-info {
+    padding: 1rem 0;
+  }
 }
 
 .book-title {
-  font-size: 0.95rem;
+  font-size: clamp(0.8rem, 1.8vw, 0.95rem);
   font-weight: 600;
   margin-bottom: 0.2rem;
   color: var(--primary-dark);
+  line-height: 1.2;
 }
 
 .book-author {
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 1.5vw, 0.85rem);
   color: #ccc;
   font-style: italic;
+  line-height: 1.2;
 }
 
 .book-meta {
   margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
 }
 
+@media (min-width: 768px) {
+  .book-meta {
+    gap: 6px;
+  }
+}
+
+.book-meta .badge {
+  font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+  padding: 0.25rem 0.5rem;
+}
+
+/* Header de biblioteca responsive */
+.library-header {
+  background-color: rgba(255, 255, 255, 0.03);
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border-left: 4px solid var(--primary-dark);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .library-header {
+    padding: 20px;
+    margin-bottom: 30px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+  }
+}
+
+.library-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+@media (min-width: 768px) {
+  .library-stats {
+    gap: 15px;
+  }
+}
+
+.stat-item {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 8px 12px;
+  border-radius: 5px;
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+}
+
+@media (min-width: 768px) {
+  .stat-item {
+    padding: 10px 15px;
+  }
+}
+
+.stat-item i {
+  margin-right: 5px;
+  color: var(--primary-dark);
+}
+
+/* Filter bar responsive */
 .filter-bar {
   background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .filter-bar {
+    padding: 1.5rem;
+  }
+}
+
+.filter-bar .d-flex {
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .filter-bar .d-flex {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: end;
+  }
 }
 
 .filter-group {
-  min-width: 150px;
+  min-width: 120px;
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .filter-group {
+    min-width: 150px;
+    max-width: 200px;
+  }
 }
 
 .filter-actions {
-  margin-left: auto;
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* Estilos para la paginación */
+@media (min-width: 768px) {
+  .filter-actions {
+    margin-left: auto;
+    justify-content: flex-end;
+  }
+}
+
+.filter-actions .btn {
+  font-size: clamp(0.8rem, 1.5vw, 0.9rem);
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+}
+
+/* Paginación responsive */
+.pagination {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 .pagination .page-link {
   color: var(--primary-dark);
   background-color: transparent;
   border-color: rgba(255, 255, 255, 0.2);
+  margin: 2px;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  padding: 0.5rem 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .pagination .page-link {
+    margin: 0;
+    padding: 0.75rem 1rem;
+  }
 }
 
 .pagination .page-item.active .page-link {
@@ -432,14 +799,20 @@ a:hover {
   color: var(--primary-dark);
 }
 
-/* Estilos para los mensajes de estado */
+/* Estados vacíos responsive */
 .empty-library {
   text-align: center;
-  padding: 60px 0;
+  padding: 40px 20px;
+}
+
+@media (min-width: 768px) {
+  .empty-library {
+    padding: 60px 0;
+  }
 }
 
 .empty-library i {
-  font-size: 3rem;
+  font-size: clamp(2rem, 5vw, 3rem);
   margin-bottom: 1rem;
   opacity: 0.6;
 }
@@ -447,138 +820,68 @@ a:hover {
 .empty-library h3 {
   color: var(--primary-dark);
   margin-bottom: 1rem;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
 }
 
+.empty-library p {
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  max-width: 500px;
+  margin: 0 auto 1rem;
+}
+
+/* Indicador de carga responsive */
 .loading-indicator {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 300px;
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .loading-indicator {
+    min-height: 300px;
+  }
 }
 
 .spinner-border {
   color: var(--primary-dark);
-  width: 3rem;
-  height: 3rem;
+  width: 2rem;
+  height: 2rem;
 }
 
-/* Estilos responsivos */
-@media (max-width: 991.98px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-  }
-
-  .filter-bar {
-    flex-direction: column;
-  }
-
-  .filter-actions {
-    margin-left: 0;
-    margin-top: 1rem;
-    display: flex;
-    justify-content: center;
-    width: 100%;
+@media (min-width: 768px) {
+  .spinner-border {
+    width: 3rem;
+    height: 3rem;
   }
 }
 
-@media (max-width: 767.98px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-  }
-
-  .book-title {
-    font-size: 0.9rem;
-  }
-
-  .book-author {
-    font-size: 0.8rem;
-  }
-}
-
-@media (max-width: 575.98px) {
-  .books-grid {
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    gap: 10px;
-  }
-
-  .library-heading {
-    font-size: 1.75rem;
-  }
-}
-
-/* Estilos para el header de la biblioteca */
-.library-header {
-  background-color: rgba(255, 255, 255, 0.03);
-  padding: 20px;
-  border-radius: 10px;
-  margin-bottom: 30px;
-  border-left: 4px solid var(--primary-dark);
-}
-
-.library-stats {
-  display: flex;
-  gap: 15px;
-  margin-top: 10px;
-}
-
-.stat-item {
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 10px 15px;
-  border-radius: 5px;
-  font-size: 0.9rem;
-}
-
-.stat-item i {
-  margin-right: 5px;
-  color: var(--primary-dark);
-}
-
-/* Animaciones */
-.book-appear {
-  animation: bookAppear 0.5s ease forwards;
-}
-
-@keyframes bookAppear {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Tooltip personalizado */
-.tooltip-inner {
-  background-color: var(--primary-dark);
-  color: var(--background);
-}
-
-.bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before,
-.bs-tooltip-top .tooltip-arrow::before {
-  border-top-color: var(--primary-dark);
-}
-
-/* Estilos adicionales para la biblioteca personal */
-
-/* Contenedor para la tarjeta del libro con botones de acción */
+/* Card container responsive */
 .book-card-container {
   position: relative;
   transition: all 0.3s ease;
 }
 
-/* Botones de acción para editar/eliminar libros */
+/* Botones de acción responsive */
 .book-actions {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 8px;
+  right: 8px;
   display: flex;
+  gap: 4px;
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 10;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .book-actions {
+    top: 10px;
+    right: 10px;
+    gap: 6px;
+    flex-direction: row;
+  }
 }
 
 .book-card-container:hover .book-actions {
@@ -586,24 +889,24 @@ a:hover {
 }
 
 .book-actions .btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background-color: rgba(255, 255, 255, 0.9);
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  font-size: 0.7rem;
+  padding: 0;
 }
 
-.book-actions .btn-outline-primary {
-  color: var(--primary);
-  border-color: var(--primary);
-}
-
-.book-actions .btn-outline-danger {
-  color: #dc3545;
-  border-color: #dc3545;
+@media (min-width: 768px) {
+  .book-actions .btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
 }
 
 .book-actions .btn:hover {
@@ -611,25 +914,79 @@ a:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Estilos para los modales */
+/* Modales responsive */
 .modal.show {
   display: block;
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-header.bg-primary {
-  background-color: var(--primary) !important;
+.modal-dialog {
+  margin: 1rem;
+  max-width: calc(100% - 2rem);
 }
 
-.modal-header.bg-danger {
-  background-color: #dc3545 !important;
+@media (min-width: 576px) {
+  .modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 500px;
+  }
 }
 
-.form-label {
-  font-weight: 500;
+@media (min-width: 992px) {
+  .modal-dialog.modal-lg {
+    max-width: 800px;
+  }
 }
 
-/* Estilos para la barra de progreso de carga */
+.modal-header {
+  padding: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (min-width: 768px) {
+  .modal-header {
+    padding: 1.5rem;
+  }
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .modal-body {
+    padding: 1.5rem;
+  }
+}
+
+.modal-footer {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 576px) {
+  .modal-footer {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+}
+
+/* Formularios en modales responsive */
+.modal .form-control,
+.modal .form-select {
+  font-size: 1rem;
+}
+
+@media (max-width: 575.98px) {
+  .modal .form-control,
+  .modal .form-select {
+    font-size: 16px; /* Prevenir zoom en iOS */
+  }
+}
+
+/* Progress bar responsive */
 .progress {
   height: 0.75rem;
   border-radius: 1rem;
@@ -642,76 +999,41 @@ a:hover {
   transition: width 0.3s ease;
 }
 
-/* Vista previa de la portada */
+/* Vista previa de portada responsive */
 .cover-preview {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.no-cover-placeholder {
-  color: #777;
-  font-style: italic;
+.cover-preview img {
+  max-height: 200px;
+  width: 100%;
+  object-fit: cover;
 }
 
-/* Ajustes responsivos para los modales */
-@media (max-width: 767.98px) {
-  .modal-dialog {
-    margin: 0.5rem;
-    max-width: calc(100% - 1rem);
+@media (min-width: 768px) {
+  .cover-preview img {
+    max-height: 250px;
   }
 }
 
-/* Ajustes para el botón de agregar libro */
-.library-header .btn-primary {
-  white-space: nowrap;
-  border-radius: 2rem;
-  padding: 0.5rem 1.25rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.library-header .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Animación de entrada para los modales */
-.modal.show .modal-dialog {
-  animation: modalSlideIn 0.3s ease forwards;
-}
-
-@keyframes modalSlideIn {
-  from {
-    transform: translateY(-30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* Mejoras para el botón de eliminar */
-.btn-danger {
-  background-color: #dc3545;
-  border-color: #dc3545;
-}
-
-.btn-danger:hover {
-  background-color: #c82333;
-  border-color: #bd2130;
-}
-
-/* Estilos para el mensaje de error/éxito */
+/* Alertas de mensaje responsive */
 .alert-message {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 9999;
-  min-width: 300px;
-  max-width: 500px;
+  min-width: 250px;
+  max-width: calc(100vw - 40px);
   animation: alertSlideIn 0.3s ease forwards;
+}
+
+@media (min-width: 576px) {
+  .alert-message {
+    min-width: 300px;
+    max-width: 500px;
+  }
 }
 
 @keyframes alertSlideIn {
@@ -725,316 +1047,13 @@ a:hover {
   }
 }
 
-/* Mejoras para los formularios */
-.form-control:focus {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 0.25rem rgba(11, 28, 43, 0.25);
-}
-
-/* Añadir estos estilos al final de src/front/index.css */
-
-/* Estilos para la página de libros de otros usuarios */
-.user-books-section {
-  background-color: rgba(255, 255, 255, 0.03);
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 30px;
-}
-
-.user-email {
-  color: var(--primary-dark);
-  font-weight: 600;
-  font-size: 1.5rem;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  margin-bottom: 20px;
-}
-
-.user-email i {
-  color: var(--primary-dark);
-}
-
-/* Mejoras visuales para los botones en la cabecera */
-.library-header .btn-outline-light {
-  border-width: 2px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.library-header .btn-outline-light:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-.library-header .btn-primary {
-  border-width: 0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* Animación para las secciones de usuarios */
-.user-books-section {
-  animation: sectionFadeIn 0.6s ease forwards;
-}
-
-@keyframes sectionFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ====== ESTILOS ADICIONALES PARA REVIEWS ====== */
-
-/* Estilos para el botón de review en los libros de otros usuarios */
-.book-actions .btn-outline-success {
-  color: #28a745;
-  border-color: #28a745;
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
-.book-actions .btn-outline-success:hover {
-  background-color: #28a745;
-  border-color: #28a745;
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Estilos para el botón de ver reviews */
-.book-actions .btn-outline-info {
-  color: #17a2b8;
-  border-color: #17a2b8;
-  background-color: rgba(255, 255, 255, 0.9);
-}
-
-.book-actions .btn-outline-info:hover {
-  background-color: #17a2b8;
-  border-color: #17a2b8;
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Estilos para las reviews dentro del modal */
-.reviews-list {
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.review-item {
-  background-color: rgba(0, 0, 0, 0.02);
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-}
-
-.review-item:hover {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.review-item:last-child {
-  border-bottom: none !important;
-  margin-bottom: 0;
-}
-
-.review-header strong {
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-}
-
-.review-rating {
-  font-size: 1rem;
-  line-height: 1.2;
-}
-
-.review-rating .text-warning {
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.review-text p {
-  color: #555;
-  line-height: 1.5;
-  margin-top: 10px;
-}
-
-/* Animaciones para los modales de reviews */
-.modal.show .modal-dialog {
-  animation: reviewModalSlideIn 0.3s ease forwards;
-}
-
-@keyframes reviewModalSlideIn {
-  from {
-    transform: translateY(-30px) scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-/* Estilos para el formulario de crear review */
-.modal-header.bg-success {
-  background-color: #28a745 !important;
-  border-bottom: 2px solid #218838;
-}
-
-.modal-header.bg-info {
-  background-color: #17a2b8 !important;
-  border-bottom: 2px solid #138496;
-}
-
-/* Estilos para el textarea de review */
-#review_text {
-  resize: vertical;
-  min-height: 120px;
-  font-family: inherit;
-}
-
-#review_text:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
-}
-
-/* Estilos para el select de rating */
-.form-select:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
-}
-
-/* Indicador de que no hay reviews */
-.fa-comment-slash {
-  opacity: 0.3;
-}
-
-/* Animación de aparición para cada review */
-.review-item {
-  animation: reviewItemAppear 0.3s ease forwards;
-}
-
-@keyframes reviewItemAppear {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* Delay progresivo para las reviews */
-.review-item:nth-child(1) {
-  animation-delay: 0.1s;
-}
-.review-item:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.review-item:nth-child(3) {
-  animation-delay: 0.3s;
-}
-.review-item:nth-child(4) {
-  animation-delay: 0.4s;
-}
-.review-item:nth-child(5) {
-  animation-delay: 0.5s;
-}
-
-/* Estilo para el contador de reviews en el footer del modal */
-.modal-footer .text-muted small {
-  font-size: 0.85rem;
-}
-
-/* Estilos responsivos para reviews */
-@media (max-width: 767.98px) {
-  .book-actions {
-    gap: 3px;
-  }
-
-  .book-actions .btn {
-    min-width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
-  }
-
-  .reviews-list {
-    max-height: 300px;
-  }
-
-  .review-item {
-    padding: 10px;
-  }
-
-  .modal-dialog.modal-lg {
-    max-width: calc(100% - 20px);
-    margin: 10px;
-  }
-}
-
-/* Estilos para el modal de detalles */
-.details-section {
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  padding: 20px;
-}
-
-.detail-item {
-  padding: 8px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.detail-item:last-child {
-  border-bottom: none;
-}
-
-.modal-content {
-  border: none;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.btn-close {
-  font-size: 1.2rem;
-  padding: 0.5rem;
-}
-
+/* Botón de favoritos responsive */
 .btn-icon {
-  background: none;
-  border: none;
-  padding: 0.5rem;
-  transition: transform 0.2s;
-}
-
-.btn-icon:hover {
-  transform: scale(1.2);
-}
-
-.fa-star {
-  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
-}
-
-.text-warning {
-  color: #ffc107 !important;
-}
-
-/* ====== ESTILOS PARA FAVORITOS ====== */
-
-/* Estilos para los botones de favoritos */
-.btn-icon {
-  background: black !important;
+  background: rgba(0, 0, 0, 0.7) !important;
   border: none;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1042,8 +1061,15 @@ a:hover {
   backdrop-filter: blur(10px);
 }
 
+@media (min-width: 768px) {
+  .btn-icon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
 .btn-icon:hover {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.8) !important;
   transform: scale(1.1);
 }
 
@@ -1051,9 +1077,16 @@ a:hover {
   box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
 }
 
-/* Animaciones para el corazón */
+/* Animaciones del corazón */
 .fa-heart {
   transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+  .fa-heart {
+    font-size: 1.2rem;
+  }
 }
 
 .fa-heart.text-danger {
@@ -1079,61 +1112,58 @@ a:hover {
   }
 }
 
-/* Efecto hover para las tarjetas de favoritos */
-.favorite-card {
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
+/* Estadísticas de favoritos responsive */
+.favorites-stats {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.1),
+    rgba(220, 53, 69, 0.05)
+  );
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 20px;
 }
 
-.favorite-card:hover {
-  border-color: #dc3545;
-  box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
-  transform: translateY(-5px);
+@media (min-width: 768px) {
+  .favorites-stats {
+    padding: 20px;
+    margin-bottom: 30px;
+  }
 }
 
-/* Badge de tipo de libro */
-.book-type-badge {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 2;
-  font-size: 0.75rem;
-  padding: 0.25rem 0.5rem;
+.favorites-stats .stat-item {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
 }
 
-/* Botón de eliminar de favoritos */
-.remove-favorite-btn {
-  background: rgba(220, 53, 69, 0.9);
-  border: none;
-  color: white;
-  transition: all 0.3s ease;
+.favorites-stats .stat-item i {
+  color: #dc3545;
 }
 
-.remove-favorite-btn:hover {
-  background: rgba(220, 53, 69, 1);
-  transform: scale(1.1);
-}
-
-.remove-favorite-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Página vacía de favoritos */
+/* Página vacía de favoritos responsive */
 .empty-favorites {
   text-align: center;
-  padding: 80px 0;
+  padding: 40px 20px;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 15px;
-  margin: 40px 0;
+  margin: 20px 0;
+}
+
+@media (min-width: 768px) {
+  .empty-favorites {
+    padding: 80px 0;
+    margin: 40px 0;
+  }
 }
 
 .empty-favorites .fa-heart-crack {
   opacity: 0.6;
   margin-bottom: 2rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
 }
 
-/* Animaciones de entrada para favoritos */
+/* Animaciones de aparición */
 .favorite-appear {
   animation: favoriteAppear 0.6s ease forwards;
 }
@@ -1149,103 +1179,507 @@ a:hover {
   }
 }
 
-/* Estadísticas de favoritos */
-.favorites-stats {
-  background: linear-gradient(
-    135deg,
-    rgba(220, 53, 69, 0.1),
-    rgba(220, 53, 69, 0.05)
-  );
-  border: 1px solid rgba(220, 53, 69, 0.2);
+.book-appear {
+  animation: bookAppear 0.5s ease forwards;
+}
+
+@keyframes bookAppear {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Secciones de usuarios responsive */
+.user-books-section {
+  background-color: rgba(255, 255, 255, 0.03);
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 30px;
+  padding: 15px;
+  margin-bottom: 20px;
 }
 
-.favorites-stats .stat-item {
-  background: rgba(220, 53, 69, 0.1);
-  border: 1px solid rgba(220, 53, 69, 0.2);
-}
-
-.favorites-stats .stat-item i {
-  color: #dc3545;
-}
-
-/* Modal de favoritos */
-.modal-header.bg-danger {
-  background: linear-gradient(135deg, #dc3545, #c82333) !important;
-}
-
-/* Responsive para favoritos */
-@media (max-width: 767.98px) {
-  .btn-icon {
-    width: 35px;
-    height: 35px;
+@media (min-width: 768px) {
+  .user-books-section {
+    padding: 20px;
+    margin-bottom: 30px;
   }
+}
 
-  .favorites-stats {
+.user-email {
+  color: var(--primary-dark);
+  font-weight: 600;
+  font-size: clamp(1.2rem, 3vw, 1.5rem);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 15px;
+}
+
+@media (min-width: 768px) {
+  .user-email {
+    margin-bottom: 20px;
+  }
+}
+
+.user-email i {
+  color: var(--primary-dark);
+}
+
+/* Reviews responsive */
+.reviews-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+@media (min-width: 768px) {
+  .reviews-list {
+    max-height: 400px;
+  }
+}
+
+.review-item {
+  background-color: rgba(0, 0, 0, 0.02);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+@media (min-width: 768px) {
+  .review-item {
     padding: 15px;
-  }
-
-  .favorites-stats .library-stats {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .empty-favorites {
-    padding: 40px 20px;
+    margin-bottom: 15px;
   }
 }
 
-/* Mejoras visuales para la navegación de favoritos */
-.navbar .nav-link[href="/favorites"] {
-  position: relative;
+.review-item:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
-.navbar .nav-link[href="/favorites"]:after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 0;
-  height: 2px;
-  background: #dc3545;
-  transition: width 0.3s ease;
+.review-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0;
 }
 
-.navbar .nav-link[href="/favorites"]:hover:after,
-.navbar .nav-link[href="/favorites"].active:after {
+.review-header strong {
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.review-rating {
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  line-height: 1.2;
+}
+
+.review-rating .text-warning {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.review-text p {
+  color: #555;
+  line-height: 1.5;
+  margin-top: 10px;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+}
+
+/* Formulario de review responsive */
+#review_text {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+@media (min-width: 768px) {
+  #review_text {
+    min-height: 120px;
+  }
+}
+
+#review_text:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+}
+
+.form-select:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25);
+}
+
+/* Detalles del libro responsive */
+.details-section {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+}
+
+@media (min-width: 768px) {
+  .details-section {
+    padding: 20px;
+  }
+}
+
+.detail-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+  font-size: clamp(0.85rem, 1.8vw, 0.95rem);
+}
+
+@media (min-width: 768px) {
+  .detail-item {
+    padding: 8px 0;
+  }
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+/* Modal content responsive */
+.modal-content {
+  border: none;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-close {
+  font-size: 1rem;
+  padding: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .btn-close {
+    font-size: 1.2rem;
+  }
+}
+
+/* Estadísticas responsive */
+.stat-display {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: bold;
+}
+
+.stat-label {
+  font-size: clamp(0.8rem, 1.8vw, 1rem);
+}
+
+/* Tablas responsive */
+.table-responsive {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table {
+  margin-bottom: 0;
+  font-size: clamp(0.8rem, 1.6vw, 0.9rem);
+}
+
+@media (max-width: 767.98px) {
+  .table thead {
+    display: none;
+  }
+
+  .table tbody tr {
+    display: block;
+    border: 1px solid #dee2e6;
+    margin-bottom: 0.5rem;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+  }
+
+  .table tbody td {
+    display: block;
+    text-align: left !important;
+    border: none;
+    padding: 0.25rem 0;
+  }
+
+  .table tbody td:before {
+    content: attr(data-label) ": ";
+    font-weight: bold;
+    display: inline-block;
+    width: 120px;
+  }
+}
+
+/* Formularios responsive */
+.form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 0.25rem rgba(11, 28, 43, 0.25);
+}
+
+@media (max-width: 575.98px) {
+  .form-control,
+  .form-select,
+  .btn {
+    font-size: 16px; /* Prevenir zoom en móviles iOS */
+  }
+}
+
+/* Mejoras para touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .book-actions {
+    opacity: 1; /* Siempre visible en touch devices */
+  }
+
+  .book-card:hover {
+    transform: none; /* Evitar efectos hover en touch */
+  }
+
+  .btn:hover .text-span {
+    display: none; /* No mostrar text span en touch */
+  }
+}
+
+/* Navegación responsive */
+@media (max-width: 991.98px) {
+  .navbar-brand img {
+    height: 30px !important;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .navbar-brand img {
+    height: 25px !important;
+  }
+}
+
+/* Input group responsive */
+.input-group {
   width: 100%;
 }
 
-/* Contador de favoritos en el navbar (opcional) */
-.favorites-count {
-  position: absolute;
-  top: -5px;
-  right: -10px;
-  background: #dc3545;
-  color: white;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: pulse 2s infinite;
+.input-group .form-control {
+  min-width: 0;
+  flex: 1;
 }
 
-/* Efecto de carga para favoritos */
-.favorites-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 400px;
+/* Botones responsive */
+.btn {
+  font-size: clamp(0.8rem, 1.6vw, 0.9rem);
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
 }
 
-.favorites-loading .spinner-border {
-  color: #dc3545;
-  width: 3rem;
-  height: 3rem;
+.btn-lg {
+  font-size: clamp(0.9rem, 1.8vw, 1.125rem);
+  padding: 0.75rem 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .btn-lg {
+    padding: 0.625rem 1.25rem;
+  }
+}
+
+/* Cards responsive */
+.card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .card-body {
+    padding: 1.5rem;
+  }
+}
+
+/* Badges responsive */
+.badge {
+  font-size: clamp(0.65rem, 1.4vw, 0.75rem);
+  padding: 0.25em 0.5em;
+}
+
+/* Iconos responsive */
+.fa-2x {
+  font-size: clamp(1.5em, 3vw, 2em) !important;
+}
+
+.fa-3x {
+  font-size: clamp(2em, 4vw, 3em) !important;
+}
+
+.fa-4x {
+  font-size: clamp(2.5em, 5vw, 4em) !important;
+}
+
+.fa-5x {
+  font-size: clamp(3em, 6vw, 5em) !important;
+}
+
+/* Márgenes y padding responsivos */
+.mb-responsive {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .mb-responsive {
+    margin-bottom: 1.5rem;
+  }
+}
+
+.p-responsive {
+  padding: 1rem;
+}
+
+@media (min-width: 768px) {
+  .p-responsive {
+    padding: 1.5rem;
+  }
+}
+
+/* Evitar desbordamiento horizontal */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+.container-fluid {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+/* Texto responsivo general */
+.display-1 {
+  font-size: clamp(2.5rem, 6vw, 5rem);
+}
+.display-2 {
+  font-size: clamp(2rem, 5vw, 4.5rem);
+}
+.display-3 {
+  font-size: clamp(1.75rem, 4.5vw, 4rem);
+}
+.display-4 {
+  font-size: clamp(1.5rem, 4vw, 3.5rem);
+}
+.display-5 {
+  font-size: clamp(1.25rem, 3.5vw, 3rem);
+}
+.display-6 {
+  font-size: clamp(1rem, 3vw, 2.5rem);
+}
+
+h1 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+h2 {
+  font-size: clamp(1.25rem, 3.5vw, 2rem);
+}
+h3 {
+  font-size: clamp(1.1rem, 3vw, 1.75rem);
+}
+h4 {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+h5 {
+  font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+}
+h6 {
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.lead {
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  line-height: 1.6;
+}
+
+/* Últimos ajustes para mejorar la experiencia móvil */
+@media (max-width: 767.98px) {
+  .modal-dialog {
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+  }
+
+  .hero-section {
+    padding: 40px 0;
+  }
+
+  .features-section,
+  .how-it-works-section,
+  .testimonials-section,
+  .cta-section {
+    padding: 40px 0;
+  }
+
+  .library-header {
+    text-align: center;
+  }
+
+  .library-header .d-flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .step {
+    text-align: left;
+  }
+
+  .testimonial-card {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Accesibilidad y usabilidad */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus visible para navegación por teclado */
+.btn:focus-visible,
+.form-control:focus-visible,
+.form-select:focus-visible {
+  outline: 2px solid var(--primary-dark);
+  outline-offset: 2px;
+}
+
+/* Mejoras para pantallas muy pequeñas */
+@media (max-width: 374px) {
+  .container {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .books-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .book-title {
+    font-size: 0.75rem;
+  }
+
+  .book-author {
+    font-size: 0.7rem;
+  }
+
+  .btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
 }

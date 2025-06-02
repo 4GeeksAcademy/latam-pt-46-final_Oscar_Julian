@@ -124,9 +124,9 @@ class Review(db.Model):
     )
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(
-        'public.users.id'), nullable=False)
+        'public.users.id'), nullable=True)
     book_id = db.Column(db.Integer, db.ForeignKey(
-        'public.personal_books.id'), nullable=False)
+        'public.personal_books.id'), nullable=True)
     review_text = db.Column(db.Text)
     rating = db.Column(db.Integer)
     user = db.relationship("User", back_populates="reviews")

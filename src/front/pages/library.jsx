@@ -445,7 +445,7 @@ export const Library = () => {
             {/* Modal para agregar libro */}
             {showAddModal && (
                 <div className="modal bg-dark show d-block" tabIndex="-1">
-                    <div className="modal-dialog modal-lg bg-dark">
+                    <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
                         <div className="modal-content">
                             <div className="modal-header bg-primary text-white">
                                 <h5 className="modal-title">Agregar Nuevo Libro</h5>

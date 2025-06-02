@@ -42,14 +42,14 @@ export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onView
                 <div className="position-absolute top-0 start-0 m-2"
                     style={{ zIndex: 1 }}>
                     <button
-                        className="btn btn-icon"
+                        className="btn btn-icon position-absolute m-1 m-md-2" 
                         onClick={handleToggleFavorite}
                         disabled={isProcessing}
                         title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
-                        style={{ background: 'none', border: 'none', padding: '0.25rem' }}
+                        style={{ top: '4px', left: '4px', zIndex: 2 }}
                     >
                         <i className={`fa${isFavorite ? 's' : 'r'} fa-heart ${isProcessing ? 'fa-spinner fa-spin' :
-                                isFavorite ? 'text-danger' : 'text-white-50'
+                            isFavorite ? 'text-danger' : 'text-white-50'
                             }`} style={{ fontSize: "1.5rem" }}></i>
                     </button>
                 </div>

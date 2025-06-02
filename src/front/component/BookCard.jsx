@@ -45,10 +45,10 @@ export const BookCard = ({ book, onViewDetails }) => {
         <div className="book-card position-relative">
             {/* Botón de favorito que siempre aparece */}
             <button
-                className="btn btn-icon position-absolute top-0 start-0 m-2"
+                className="btn btn-icon position-absolute m-1 m-md-2"
                 onClick={handleToggleFavorite}
                 disabled={isProcessing}
-                style={{ zIndex: 1 }}
+                style={{ top: '4px', left: '4px', zIndex: 2 }}
                 title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
             >
                 <i className={`fa${isFavorite ? 's' : 'r'} fa-heart ${isProcessing ? 'fa-spinner fa-spin' :

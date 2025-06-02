@@ -12,7 +12,7 @@ export const SearchBar = () => {
     };
 
     return (
-        <form className="d-flex mx-2 flex-grow-1 mx-lg-4" onSubmit={handleSearch}>
+        <form className="d-flex mx-2 flex-grow-1 mx-lg-4 search-bar" onSubmit={handleSearch}>
             <div className="input-group">
                 <input
                     type="search"

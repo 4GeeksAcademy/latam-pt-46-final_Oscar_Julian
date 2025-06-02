@@ -103,8 +103,8 @@ export const FilterBar = ({ bookType = "explore" }) => {
     }, [sortBy, sortOrder]);
 
     return (
-        <div className="filter-bar p-3 mb-4 rounded shadow-sm">
-            <div className="d-flex flex-wrap align-items-end gap-3">
+        <div className="filter-bar p-2 p-md-3 mb-4 rounded shadow-sm">
+            <div className="d-flex flex-column flex-md-row flex-wrap align-items-stretch align-items-md-end gap-2 gap-md-3">
                 {/* Filtro de Autor */}
                 <div className="filter-group">
                     <label htmlFor="author-filter" className="form-label">Autor</label>
