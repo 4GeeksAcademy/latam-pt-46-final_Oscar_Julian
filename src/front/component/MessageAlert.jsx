@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useGlobalReducer } from "../store/globalReducer";
 
 export const MessageAlert = () => {

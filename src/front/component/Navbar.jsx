@@ -6,7 +6,7 @@ import { SearchBar } from "./SearchBar";
 export const Navbar = () => {
 	const { store, actions } = useGlobalReducer();
 	const navigate = useNavigate();
-	
+
 	const handleLogout = () => {
 		actions.logout();
 		navigate("/login");
@@ -105,6 +105,10 @@ export const Navbar = () => {
 						</>
 					) : (
 						<>
+							<Link className="btn btn-outline-light home-btn" to="/favorites">
+								<i className="fa-solid fa-heart me-1 text-danger"></i>
+								<span className="text-span">Favoritos</span>
+							</Link>
 							<Link to="/welcome" className="btn btn-outline-light home-btn">
 								<i className="fa-solid fa-magnifying-glass-plus"></i>
 								<span className="text-span">Explorar</span>

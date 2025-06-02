@@ -205,11 +205,6 @@ export const useGlobalReducer = () => {
 export const GlobalProvider = ({ children }) => {
     const [store, dispatch] = useReducer(reducer, initialState);
 
-    // For debugging - log the API URL on load
-    useEffect(() => {
-        // console.log("Current API URL:", store.apiUrl);
-    }, [store.apiUrl]);
-
     // Verificar token al cargar el proveedor
     useEffect(() => {
         const checkToken = async () => {
@@ -218,7 +213,6 @@ export const GlobalProvider = ({ children }) => {
             if (token) {
                 try {
                     const apiUrl = `${store.apiUrl}/api/user`;
-                    // console.log("Validating token using URL:", apiUrl);
 
                     const response = await fetch(apiUrl, {
                         method: "GET",
@@ -252,7 +246,6 @@ export const GlobalProvider = ({ children }) => {
 
             try {
                 const apiUrl = `${store.apiUrl}/api/signup`;
-                // console.log("Signup request to:", apiUrl);
 
                 const response = await fetch(apiUrl, {
                     method: "POST",
@@ -293,7 +286,6 @@ export const GlobalProvider = ({ children }) => {
                     return true;
                 }
             } catch (error) {
-                // console.error("Signup error:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Network error. Please check your connection and try again."
@@ -504,7 +496,6 @@ export const GlobalProvider = ({ children }) => {
 
                 return data.data || [];
             } catch (error) {
-                // console.error("Error fetching personal books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar tus libros. Por favor, intenta más tarde."
@@ -547,7 +538,6 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                // console.error("Error creating personal book:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al crear el libro: ${error.message}`
@@ -590,7 +580,6 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                // console.error("Error updating personal book:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al actualizar el libro: ${error.message}`
@@ -629,7 +618,6 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                // console.error("Error deleting personal book:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al eliminar el libro: ${error.message}`
@@ -661,7 +649,7 @@ export const GlobalProvider = ({ children }) => {
             }, 5000);
         },
 
-        // Añadir esta nueva acción
+        // Obtener libros de otros usuarios
         getOtherUsersBooks: async () => {
             dispatch({ type: ACTIONS.SET_LOADING, payload: true });
 
@@ -688,7 +676,6 @@ export const GlobalProvider = ({ children }) => {
 
                 return data.data || [];
             } catch (error) {
-                // console.error("Error fetching other users books:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar los libros de otros usuarios. Por favor, intenta más tarde."
@@ -697,59 +684,6 @@ export const GlobalProvider = ({ children }) => {
                 return [];
             }
         },
-
-        // Modificar getPersonalBooks para que solo obtenga los libros del usuario actual
-        // getPersonalBooks: async (page = 1, filters = {}) => {
-        //     dispatch({ type: ACTIONS.SET_LOADING, payload: true });
-
-        //     try {
-        //         const current_user_id = store.user ? store.user.id : null;
-        //         if (!current_user_id) {
-        //             throw new Error('User not authenticated');
-        //         }
-
-        //         // Construir parámetros de consulta para paginación y filtros
-        //         const queryParams = new URLSearchParams();
-        //         if (page) queryParams.append('page', page);
-        //         Object.entries(filters).forEach(([key, value]) => {
-        //             if (value) queryParams.append(key, value);
-        //         });
-
-        //         const apiUrl = `${store.apiUrl}/api/personal-books?${queryParams.toString()}`;
-        //         const token = sessionStorage.getItem("token");
-
-        //         const response = await fetch(apiUrl, {
-        //             method: "GET",
-        //             headers: {
-        //                 "Authorization": `Bearer ${token}`
-        //             }
-        //         });
-
-        //         if (!response.ok) {
-        //             throw new Error('Error fetching personal books');
-        //         }
-
-        //         const data = await response.json();
-
-        //         // Filtrar para mostrar solo los libros del usuario actual
-        //         const userBooks = data.data ? data.data.filter(book => book.created_by === current_user_id) : [];
-
-        //         dispatch({ type: ACTIONS.SET_PERSONAL_BOOKS, payload: userBooks });
-        //         dispatch({ type: ACTIONS.SET_TOTAL_PERSONAL_BOOKS, payload: userBooks.length });
-        //         dispatch({ type: ACTIONS.SET_CURRENT_PAGE, payload: page });
-        //         dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-
-        //         return userBooks;
-        //     } catch (error) {
-        //         // console.error("Error fetching personal books:", error);
-        //         dispatch({
-        //             type: ACTIONS.SET_MESSAGE,
-        //             payload: "Error al cargar tus libros. Por favor, intenta más tarde."
-        //         });
-        //         dispatch({ type: ACTIONS.SET_LOADING, payload: false });
-        //         return [];
-        //     }
-        // },
 
         // Siembra de Libros
         seedBooks: async () => {
@@ -826,9 +760,19 @@ export const GlobalProvider = ({ children }) => {
                 // Actualizar lista de favoritos
                 await actions.getFavorites();
 
-                return newFavorite;
+                // Mostrar mensaje de éxito
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Libro agregado a favoritos ❤️"
+                });
+
+                return true;
             } catch (error) {
-                actions.setMessage(error.message);
+                console.error("Error adding to favorites:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Error al agregar a favoritos"
+                });
                 return false;
             }
         },
@@ -856,9 +800,19 @@ export const GlobalProvider = ({ children }) => {
                 // Actualizar lista de favoritos
                 await actions.getFavorites();
 
-                return newFavorite;
+                // Mostrar mensaje de éxito
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Libro agregado a favoritos ❤️"
+                });
+
+                return true;
             } catch (error) {
-                actions.setMessage(error.message);
+                console.error("Error adding to favorites:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Error al agregar a favoritos"
+                });
                 return false;
             }
         },
@@ -885,7 +839,7 @@ export const GlobalProvider = ({ children }) => {
                     favorites: data.favorites || []
                 };
             } catch (error) {
-                // console.error("Error fetching favorites:", error);
+                console.error("Error fetching favorites:", error);
                 dispatch({ type: ACTIONS.SET_FAVORITES, payload: [] });
                 return {
                     success: false,
@@ -917,18 +871,20 @@ export const GlobalProvider = ({ children }) => {
                 const updatedFavorites = store.favorites.filter(fav => fav.id !== favoriteId);
                 dispatch({ type: ACTIONS.SET_FAVORITES, payload: updatedFavorites });
 
+                // Mostrar mensaje de éxito
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
-                    payload: "Eliminado de favoritos exitosamente"
+                    payload: "Libro eliminado de favoritos 💔"
                 });
+
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
 
                 return true;
             } catch (error) {
-                // console.error("Error removing favorite:", error);
+                console.error("Error removing favorite:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
-                    payload: `Error al eliminar de favoritos: ${error.message}`
+                    payload: "Error al eliminar de favoritos"
                 });
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 return false;
@@ -946,36 +902,6 @@ export const GlobalProvider = ({ children }) => {
                     return fav.book_type === 'personal' && fav.personal_book_id === bookId;
                 }
             });
-        },
-
-        // Función helper para crear libro personal desde explorar
-        createPersonalBookFromExplore: async (bookData) => {
-            try {
-                const token = sessionStorage.getItem("token");
-                const response = await fetch(`${store.apiUrl}/api/personal-books`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(bookData)
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Error al crear libro personal');
-                }
-
-                const newBook = await response.json();
-
-                // Actualizar lista de libros personales
-                dispatch({ type: ACTIONS.ADD_PERSONAL_BOOK, payload: newBook.book });
-
-                return newBook.book;
-            } catch (error) {
-                actions.setMessage(error.message);
-                return false;
-            }
         },
 
         // ====== FUNCIONES PARA REVIEWS ======
@@ -1005,7 +931,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return reviews;
             } catch (error) {
-                // console.error("Error fetching book reviews:", error);
+                console.error("Error fetching book reviews:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: "Error al cargar las reviews. Por favor, intenta más tarde."
@@ -1047,7 +973,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                // console.error("Error creating review:", error);
+                console.error("Error creating review:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al crear la review: ${error.message}`
@@ -1089,7 +1015,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                // console.error("Error updating review:", error);
+                console.error("Error updating review:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al actualizar la review: ${error.message}`
@@ -1128,7 +1054,7 @@ export const GlobalProvider = ({ children }) => {
 
                 return true;
             } catch (error) {
-                // console.error("Error deleting review:", error);
+                console.error("Error deleting review:", error);
                 dispatch({
                     type: ACTIONS.SET_MESSAGE,
                     payload: `Error al eliminar la review: ${error.message}`
@@ -1136,78 +1062,7 @@ export const GlobalProvider = ({ children }) => {
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
                 return false;
             }
-        },
-
-        createPersonalBookFromExplore: async (bookData) => {
-            try {
-                const token = sessionStorage.getItem("token");
-                const response = await fetch(`${store.apiUrl}/api/personal-books`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(bookData)
-                });
-
-                if (!response.ok) throw new Error('Error al crear libro personal');
-                return true;
-            } catch (error) {
-                actions.setMessage(error.message);
-                return false;
-            }
-        },
-
-        // Agregar a explore-boks
-        addExploreFavorite: async (exploreBookId) => {
-            try {
-                const token = sessionStorage.getItem("token");
-                const response = await fetch(`${store.apiUrl}/api/favorites/explore`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ explore_book_id: exploreBookId })
-                });
-
-                if (!response.ok) throw new Error('Error al agregar a favoritos');
-                return true;
-            } catch (error) {
-                actions.setMessage(error.message);
-                return false;
-            }
-        },
-
-        // Obtener todos los Favoritos
-        getFavorites: async () => {
-            try {
-                const token = sessionStorage.getItem("token");
-                const response = await fetch(`${store.apiUrl}/api/favorites`, {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
-
-                if (!response.ok) throw new Error('Error al obtener favoritos');
-
-                const data = await response.json();
-                dispatch({ type: ACTIONS.SET_FAVORITES, payload: data.favorites });
-                return {
-                    success: data.success,
-                    count: data.count,
-                    favorites: data.favorites
-                };
-            } catch (error) {
-                actions.setMessage(error.message);
-                return {
-                    success: false,
-                    count: 0,
-                    favorites: []
-                };
-            }
-        },
+        }
     };
 
     return (

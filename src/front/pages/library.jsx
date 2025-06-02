@@ -829,9 +829,6 @@ export const Library = () => {
             {(showAddModal || showEditModal || showDeleteModal || showReviewsModal || showDetailModal) && (
                 <div className="modal-backdrop fade show"></div>
             )}
-
-            {/* Componente de mensaje */}
-            <MessageAlert />
         </div>
     );
 };

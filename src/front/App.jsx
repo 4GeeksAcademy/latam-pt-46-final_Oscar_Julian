@@ -19,6 +19,7 @@ import { Navbar } from "./component/Navbar";
 import { Footer } from "./component/Footer";
 import { GlobalProvider, useGlobalReducer } from "./store/globalReducer";
 import { ProtectedRoute } from "./component/protectedRoute";
+import { MessageAlert } from "./component/MessageAlert";
 
 // Componente para inicializar la validación de token
 const AppInitializer = ({ children }) => {
@@ -81,6 +82,7 @@ const App = () => {
                             <Route path="*" element={<NotFound />} />
                         </Routes>
                         <Footer />
+                        <MessageAlert />
                     </ScrollToTop>
                 </AppInitializer>
             </BrowserRouter>

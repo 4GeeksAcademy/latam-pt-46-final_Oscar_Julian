@@ -20,12 +20,22 @@ export const BookCard = ({ book, onViewDetails }) => {
                 );
 
                 if (favorite) {
-                    await actions.removeFavorite(favorite.id);
+                    const success = await actions.removeFavorite(favorite.id);
+                    if (success) {
+                        // Forzar actualización de favoritos
+                        await actions.getFavorites();
+                    }
                 }
             } else {
                 // Agregar a favoritos
-                await actions.addExploreFavorite(book.id);
+                const success = await actions.addExploreFavorite(book.id);
+                if (success) {
+                    // Forzar actualización de favoritos
+                    await actions.getFavorites();
+                }
             }
+        } catch (error) {
+            console.error("Error al manejar favorito:", error);
         } finally {
             setIsProcessing(false);
         }
@@ -42,7 +52,7 @@ export const BookCard = ({ book, onViewDetails }) => {
                 title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
             >
                 <i className={`fa${isFavorite ? 's' : 'r'} fa-heart ${isProcessing ? 'fa-spinner fa-spin' :
-                        isFavorite ? 'text-danger' : 'text-white-50'
+                    isFavorite ? 'text-danger' : 'text-white-50'
                     }`}></i>
             </button>
 
