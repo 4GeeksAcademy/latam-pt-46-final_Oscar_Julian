@@ -15,6 +15,7 @@ CORS(api,
      allow_headers=["Content-Type", "Authorization"],
      supports_credentials=True)
 
+
 @api.before_request
 def handle_preflight():
     if request.method == "OPTIONS":
@@ -37,6 +38,7 @@ def after_request(response):
     return response
 
 #  --------------------------------------------- INICIO DE SESIÓN ---------------------------------------------------------------------
+
 
 @api.route('/signup', methods=['POST'])
 def signup():
@@ -451,6 +453,7 @@ def update_user(user_id):
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
+
 @api.route('/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
@@ -683,7 +686,15 @@ def add_explore_favorite():
         db.session.add(new_favorite)
         db.session.commit()
 
-        return jsonify(new_favorite.serialize()), 201
+        # Return the favorite with book data
+        favorite_data = new_favorite.serialize()
+        favorite_data['book'] = book.serialize()
+        favorite_data['book_type'] = 'explore'
+
+        return jsonify({
+            "message": "Added to favorites successfully",
+            "favorite": favorite_data
+        }), 201
 
     except Exception as e:
         db.session.rollback()
@@ -724,7 +735,15 @@ def add_personal_favorite():
         db.session.add(new_favorite)
         db.session.commit()
 
-        return jsonify(new_favorite.serialize()), 201
+        # Return the favorite with book data
+        favorite_data = new_favorite.serialize()
+        favorite_data['book'] = book.serialize()
+        favorite_data['book_type'] = 'personal'
+
+        return jsonify({
+            "message": "Added to favorites successfully",
+            "favorite": favorite_data
+        }), 201
 
     except Exception as e:
         db.session.rollback()

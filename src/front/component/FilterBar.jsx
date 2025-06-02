@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useGlobalReducer } from "../store/globalReducer";
 
 export const FilterBar = ({ bookType = "explore" }) => {
@@ -10,28 +11,16 @@ export const FilterBar = ({ bookType = "explore" }) => {
     const [categoryFilter, setCategoryFilter] = useState("");
     const [sortBy, setSortBy] = useState("title");
     const [sortOrder, setSortOrder] = useState("asc");
-    const [showFavorites, setShowFavorites] = useState(false);
 
     // Listados únicos para los filtros
     const [uniqueAuthors, setUniqueAuthors] = useState([]);
     const [uniqueGenres, setUniqueGenres] = useState([]);
     const [uniqueCategories, setUniqueCategories] = useState([]);
 
-    // Toggle para favoritos con actualización funcional
-    const toggleFavorites = () => {
-        setShowFavorites(prev => !prev);
-    };
-
     // Obtener libros filtrados
     const getBooksData = () => {
         if (bookType === "personal") {
-            const personalBooks = store.personalBooks || [];
-            
-            if (showFavorites) {
-                const favoriteTitles = (store.favorites || []).map(fav => fav?.book?.title).filter(Boolean);
-                return personalBooks.filter(book => favoriteTitles.includes(book.title));
-            }
-            return personalBooks;
+            return store.personalBooks || [];
         }
         return store.books || [];
     };
@@ -44,7 +33,7 @@ export const FilterBar = ({ bookType = "explore" }) => {
     // Actualizar listas únicas
     useEffect(() => {
         const booksData = getBooksData();
-        
+
         if (booksData?.length > 0) {
             const authors = [...new Set(booksData.map(book => getAuthorName(book)).filter(Boolean))];
             setUniqueAuthors(authors.sort());
@@ -55,14 +44,14 @@ export const FilterBar = ({ bookType = "explore" }) => {
             const categories = [...new Set(booksData.map(book => book.category).filter(Boolean))];
             setUniqueCategories(categories.sort());
         }
-    }, [store.personalBooks, store.books, store.favorites, bookType, showFavorites]);
+    }, [store.personalBooks, store.books, bookType]);
 
     // Aplicar filtros al servidor
     const applyFilters = () => {
-        const filters = { 
-            author: authorFilter, 
-            genre: genreFilter, 
-            category: categoryFilter 
+        const filters = {
+            author: authorFilter,
+            genre: genreFilter,
+            category: categoryFilter
         };
         actions.setFilters(filters);
 
@@ -80,7 +69,6 @@ export const FilterBar = ({ bookType = "explore" }) => {
         setCategoryFilter("");
         setSortBy("title");
         setSortOrder("asc");
-        setShowFavorites(false);
         actions.clearFilters();
 
         if (bookType === "personal") {
@@ -98,9 +86,9 @@ export const FilterBar = ({ bookType = "explore" }) => {
         const sortedBooks = [...booksData].sort((a, b) => {
             const valueA = (sortBy === "author" ? getAuthorName(a) : a[sortBy])?.toLowerCase() || "";
             const valueB = (sortBy === "author" ? getAuthorName(b) : b[sortBy])?.toLowerCase() || "";
-            
-            return sortOrder === "asc" 
-                ? valueA.localeCompare(valueB) 
+
+            return sortOrder === "asc"
+                ? valueA.localeCompare(valueB)
                 : valueB.localeCompare(valueA);
         });
 
@@ -112,7 +100,7 @@ export const FilterBar = ({ bookType = "explore" }) => {
 
     useEffect(() => {
         applySort();
-    }, [sortBy, sortOrder, showFavorites]);
+    }, [sortBy, sortOrder]);
 
     return (
         <div className="filter-bar p-3 mb-4 rounded shadow-sm">
@@ -197,19 +185,19 @@ export const FilterBar = ({ bookType = "explore" }) => {
                 {/* Botones de Acción */}
                 <div className="filter-actions mt-3 mt-md-0 d-flex gap-2">
                     {bookType === "personal" && (
-                        <button 
-                            className={`btn ${showFavorites ? 'btn-warning' : 'btn-outline-warning'}`}
-                            onClick={toggleFavorites}
+                        <Link
+                            to="/favorites"
+                            className="btn btn-outline-danger"
                         >
-                            <i className={`fa-solid fa-star ${showFavorites ? 'text-white' : ''}`}></i>
-                            {showFavorites ? " Mostrar Todos" : " Solo Favoritos"}
-                        </button>
+                            <i className="fa-solid fa-heart me-1"></i>
+                            Ver Favoritos
+                        </Link>
                     )}
-                    
+
                     <button className="btn btn-primary" onClick={applyFilters}>
                         <i className="fa-solid fa-filter me-1"></i> Aplicar
                     </button>
-                    
+
                     <button className="btn btn-secondary" onClick={clearFilters}>
                         <i className="fa-solid fa-broom me-1"></i> Limpiar
                     </button>

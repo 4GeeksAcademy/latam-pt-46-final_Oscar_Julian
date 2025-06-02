@@ -774,7 +774,7 @@ export const GlobalProvider = ({ children }) => {
                             cover_image: book.formats?.['image/jpeg'] || '',
                             summary: book.summaries?.[0] || '',
                             created_by: 1,
-                            created_date: new Date().toISOString().split('T')[0] 
+                            created_date: new Date().toISOString().split('T')[0]
                         };
 
                         await fetch(`${store.apiUrl}/api/explore-books`, {
@@ -798,6 +798,183 @@ export const GlobalProvider = ({ children }) => {
             } finally {
                 dispatch({ type: ACTIONS.SEED_BOOKS, payload: false });
                 dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+            }
+        },
+
+        // ====== FUNCIONES PARA FAVORITOS ======
+
+        // Agregar a explore-books favoritos
+        addExploreFavorite: async (exploreBookId) => {
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/favorites/explore`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ explore_book_id: exploreBookId })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al agregar a favoritos');
+                }
+
+                const newFavorite = await response.json();
+
+                // Actualizar lista de favoritos
+                await actions.getFavorites();
+
+                return newFavorite;
+            } catch (error) {
+                actions.setMessage(error.message);
+                return false;
+            }
+        },
+
+        // Agregar libro personal a favoritos
+        addPersonalFavorite: async (personalBookId) => {
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/favorites/personal`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ personal_book_id: personalBookId })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al agregar a favoritos');
+                }
+
+                const newFavorite = await response.json();
+
+                // Actualizar lista de favoritos
+                await actions.getFavorites();
+
+                return newFavorite;
+            } catch (error) {
+                actions.setMessage(error.message);
+                return false;
+            }
+        },
+
+        // Obtener todos los Favoritos
+        getFavorites: async () => {
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/favorites`, {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error al obtener favoritos');
+
+                const data = await response.json();
+                dispatch({ type: ACTIONS.SET_FAVORITES, payload: data.favorites || [] });
+
+                return {
+                    success: data.success,
+                    count: data.count,
+                    favorites: data.favorites || []
+                };
+            } catch (error) {
+                // console.error("Error fetching favorites:", error);
+                dispatch({ type: ACTIONS.SET_FAVORITES, payload: [] });
+                return {
+                    success: false,
+                    count: 0,
+                    favorites: []
+                };
+            }
+        },
+
+        // Eliminar favorito
+        removeFavorite: async (favoriteId) => {
+            dispatch({ type: ACTIONS.SET_LOADING, payload: true });
+
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/favorites/${favoriteId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al eliminar de favoritos');
+                }
+
+                // Actualizar lista de favoritos después de eliminar
+                const updatedFavorites = store.favorites.filter(fav => fav.id !== favoriteId);
+                dispatch({ type: ACTIONS.SET_FAVORITES, payload: updatedFavorites });
+
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: "Eliminado de favoritos exitosamente"
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+
+                return true;
+            } catch (error) {
+                // console.error("Error removing favorite:", error);
+                dispatch({
+                    type: ACTIONS.SET_MESSAGE,
+                    payload: `Error al eliminar de favoritos: ${error.message}`
+                });
+                dispatch({ type: ACTIONS.SET_LOADING, payload: false });
+                return false;
+            }
+        },
+
+        // Verificar si un libro está en favoritos
+        isFavorite: (bookId, bookType) => {
+            if (!store.favorites || store.favorites.length === 0) return false;
+
+            return store.favorites.some(fav => {
+                if (bookType === 'explore') {
+                    return fav.book_type === 'explore' && fav.explore_book_id === bookId;
+                } else {
+                    return fav.book_type === 'personal' && fav.personal_book_id === bookId;
+                }
+            });
+        },
+
+        // Función helper para crear libro personal desde explorar
+        createPersonalBookFromExplore: async (bookData) => {
+            try {
+                const token = sessionStorage.getItem("token");
+                const response = await fetch(`${store.apiUrl}/api/personal-books`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || 'Error al crear libro personal');
+                }
+
+                const newBook = await response.json();
+
+                // Actualizar lista de libros personales
+                dispatch({ type: ACTIONS.ADD_PERSONAL_BOOK, payload: newBook.book });
+
+                return newBook.book;
+            } catch (error) {
+                actions.setMessage(error.message);
+                return false;
             }
         },
 
@@ -1014,7 +1191,7 @@ export const GlobalProvider = ({ children }) => {
                 });
 
                 if (!response.ok) throw new Error('Error al obtener favoritos');
-                
+
                 const data = await response.json();
                 dispatch({ type: ACTIONS.SET_FAVORITES, payload: data.favorites });
                 return {

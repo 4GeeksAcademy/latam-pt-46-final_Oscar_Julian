@@ -5,35 +5,26 @@ export const BookCard = ({ book, onViewDetails }) => {
     const { store, actions } = useGlobalReducer();
     const [isProcessing, setIsProcessing] = useState(false);
 
-    // Verificar si el libro está en favoritos usando el store global
-    const isFavorite = store.favorites.some(fav => 
-        fav.book_type === 'explore' && fav.explore_book_id === book.id
-    );
+    // Verificar si el libro está en favoritos usando el helper del store
+    const isFavorite = actions.isFavorite(book.id, 'explore');
 
-    const handleAddToLibraryAndFavorites = async () => {
+    const handleToggleFavorite = async (e) => {
+        e.stopPropagation();
         setIsProcessing(true);
-        try {
-            const personalBookData = {
-                title: book.title,
-                author_name: book.author,
-                genre: book.genre,
-                category: book.category,
-                summary: book.summary,
-                cover_image: book.coverImage
-            };
 
-            // Paso 1: Crear libro personal
-            const personalBookResponse = await actions.createPersonalBookFromExplore(personalBookData);
-            
-            if (personalBookResponse) {
-                // Paso 2: Agregar a favoritos
-                const favoriteResponse = await actions.addExploreFavorite(book.id);
-                
-                if (favoriteResponse) {
-                    // Actualizar la lista global de favoritos
-                    await actions.getFavorites();
-                    actions.setMessage("¡Libro agregado a tu biblioteca y favoritos!");
+        try {
+            if (isFavorite) {
+                // Encontrar el favorito y eliminarlo
+                const favorite = store.favorites.find(fav =>
+                    fav.book_type === 'explore' && fav.explore_book_id === book.id
+                );
+
+                if (favorite) {
+                    await actions.removeFavorite(favorite.id);
                 }
+            } else {
+                // Agregar a favoritos
+                await actions.addExploreFavorite(book.id);
             }
         } finally {
             setIsProcessing(false);
@@ -42,17 +33,18 @@ export const BookCard = ({ book, onViewDetails }) => {
 
     return (
         <div className="book-card position-relative">
-            {/* Mostrar botón de favorito solo si no está en favoritos */}
-            {!isFavorite && (
-                <button
-                    className="btn btn-icon position-absolute top-0 start-0 m-2"
-                    onClick={handleAddToLibraryAndFavorites}
-                    disabled={isProcessing}
-                    style={{ zIndex: 1 }}
-                >
-                    <i className={`fa${isProcessing ? ' fa-spinner fa-spin' : 's'} fa-star text-warning`}></i>
-                </button>
-            )}
+            {/* Botón de favorito que siempre aparece */}
+            <button
+                className="btn btn-icon position-absolute top-0 start-0 m-2"
+                onClick={handleToggleFavorite}
+                disabled={isProcessing}
+                style={{ zIndex: 1 }}
+                title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}
+            >
+                <i className={`fa${isFavorite ? 's' : 'r'} fa-heart ${isProcessing ? 'fa-spinner fa-spin' :
+                        isFavorite ? 'text-danger' : 'text-white-50'
+                    }`}></i>
+            </button>
 
             {/* Contenido de la tarjeta */}
             <div className="book-cover" onClick={onViewDetails}>
@@ -68,7 +60,7 @@ export const BookCard = ({ book, onViewDetails }) => {
                     </div>
                 )}
             </div>
-            
+
             <div className="book-info mt-3" style={{ minWidth: 0 }}>
                 <h5 className="book-title text-truncate">{book.title}</h5>
                 <p className="book-author mb-1 text-truncate">{book.author}</p>

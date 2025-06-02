@@ -7,6 +7,7 @@ import { Signup } from "./pages/signup";
 import { Welcome } from "./pages/welcome";
 import { Library } from "./pages/library";
 import { OtherBooks } from "./pages/OtherBooks";
+import { Favorites } from "./pages/Favorites";
 import { Terms } from "./pages/Terms";
 import { About } from "./pages/About";
 import { Features } from "./pages/Features";
@@ -63,6 +64,11 @@ const App = () => {
                             <Route path="/other-books" element={
                                 <ProtectedRoute>
                                     <OtherBooks />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/favorites" element={
+                                <ProtectedRoute>
+                                    <Favorites />
                                 </ProtectedRoute>
                             } />
                             <Route path="/stats" element={

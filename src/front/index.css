@@ -979,49 +979,273 @@ a:hover {
 
 /* Estilos para el modal de detalles */
 .details-section {
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
 }
 
 .detail-item {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .detail-item:last-child {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 .modal-content {
-    border: none;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+  border: none;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
-    border-bottom: 2px solid rgba(255,255,255,0.1);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .btn-close {
-    font-size: 1.2rem;
-    padding: 0.5rem;
+  font-size: 1.2rem;
+  padding: 0.5rem;
 }
 
 .btn-icon {
-    background: none;
-    border: none;
-    padding: 0.5rem;
-    transition: transform 0.2s;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  transition: transform 0.2s;
 }
 
 .btn-icon:hover {
-    transform: scale(1.2);
+  transform: scale(1.2);
 }
 
 .fa-star {
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.25));
 }
 
 .text-warning {
-    color: #ffc107 !important;
+  color: #ffc107 !important;
+}
+
+/* ====== ESTILOS PARA FAVORITOS ====== */
+
+/* Estilos para los botones de favoritos */
+.btn-icon {
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.btn-icon:hover {
+  background: rgba(0, 0, 0, 0.7);
+  transform: scale(1.1);
+}
+
+.btn-icon:focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+/* Animaciones para el corazón */
+.fa-heart {
+  transition: all 0.3s ease;
+}
+
+.fa-heart.text-danger {
+  animation: heartBeat 0.5s ease-in-out;
+  filter: drop-shadow(0 0 8px rgba(220, 53, 69, 0.6));
+}
+
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1);
+  }
+  75% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Efecto hover para las tarjetas de favoritos */
+.favorite-card {
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.favorite-card:hover {
+  border-color: #dc3545;
+  box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+  transform: translateY(-5px);
+}
+
+/* Badge de tipo de libro */
+.book-type-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Botón de eliminar de favoritos */
+.remove-favorite-btn {
+  background: rgba(220, 53, 69, 0.9);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.remove-favorite-btn:hover {
+  background: rgba(220, 53, 69, 1);
+  transform: scale(1.1);
+}
+
+.remove-favorite-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Página vacía de favoritos */
+.empty-favorites {
+  text-align: center;
+  padding: 80px 0;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 15px;
+  margin: 40px 0;
+}
+
+.empty-favorites .fa-heart-crack {
+  opacity: 0.6;
+  margin-bottom: 2rem;
+}
+
+/* Animaciones de entrada para favoritos */
+.favorite-appear {
+  animation: favoriteAppear 0.6s ease forwards;
+}
+
+@keyframes favoriteAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Estadísticas de favoritos */
+.favorites-stats {
+  background: linear-gradient(
+    135deg,
+    rgba(220, 53, 69, 0.1),
+    rgba(220, 53, 69, 0.05)
+  );
+  border: 1px solid rgba(220, 53, 69, 0.2);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+}
+
+.favorites-stats .stat-item {
+  background: rgba(220, 53, 69, 0.1);
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.favorites-stats .stat-item i {
+  color: #dc3545;
+}
+
+/* Modal de favoritos */
+.modal-header.bg-danger {
+  background: linear-gradient(135deg, #dc3545, #c82333) !important;
+}
+
+/* Responsive para favoritos */
+@media (max-width: 767.98px) {
+  .btn-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .favorites-stats {
+    padding: 15px;
+  }
+
+  .favorites-stats .library-stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .empty-favorites {
+    padding: 40px 20px;
+  }
+}
+
+/* Mejoras visuales para la navegación de favoritos */
+.navbar .nav-link[href="/favorites"] {
+  position: relative;
+}
+
+.navbar .nav-link[href="/favorites"]:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: #dc3545;
+  transition: width 0.3s ease;
+}
+
+.navbar .nav-link[href="/favorites"]:hover:after,
+.navbar .nav-link[href="/favorites"].active:after {
+  width: 100%;
+}
+
+/* Contador de favoritos en el navbar (opcional) */
+.favorites-count {
+  position: absolute;
+  top: -5px;
+  right: -10px;
+  background: #dc3545;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+}
+
+/* Efecto de carga para favoritos */
+.favorites-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.favorites-loading .spinner-border {
+  color: #dc3545;
+  width: 3rem;
+  height: 3rem;
 }
