@@ -4,6 +4,7 @@ import { useGlobalReducer } from "../store/globalReducer";
 import { BookCard } from "../component/BookCard";
 import { Pagination } from "../component/Pagination";
 import { FilterBar } from "../component/FilterBar";
+import { MessageAlert } from "../component/MessageAlert";
 
 export const Welcome = () => {
     const { store, actions } = useGlobalReducer();
@@ -16,22 +17,60 @@ export const Welcome = () => {
     const [bookDetails, setBookDetails] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
-    // Verificar autenticación cuando el componente carga, Cargar Favoritos
+    // Verificar autenticación y cargar datos
     useEffect(() => {
         const checkAuth = async () => {
             await actions.validateToken();
             setLoading(false);
         };
 
-        const loadFavorites = async () => {
+        const loadData = async () => {
             if (store.user) {
                 await actions.getFavorites();
+                await actions.getPersonalBooks();
             }
         };
         
-        loadFavorites();
+        loadData();
         checkAuth();
     }, []);
+
+    // Función para agregar un libro a la biblioteca personal
+    const addToPersonalLibrary = async (book, e) => {
+        e.stopPropagation();
+        
+        try {
+            // Verificar si ya existe en libros personales
+            const existingBook = store.personalBooks.find(
+                pb => pb.explore_book_id === book.id
+            );
+            
+            if (existingBook) {
+                actions.setMessage("Este libro ya está en tu biblioteca");
+                return;
+            }
+            
+            // Crear el libro personal
+            const bookData = {
+                title: book.title,
+                author_name: book.author,
+                genre: book.genre,
+                category: book.category,
+                cover_image: book.coverImage,
+                explore_book_id: book.id
+            };
+            
+            const success = await actions.createPersonalBook(bookData);
+            if (success) {
+                actions.setMessage("Libro agregado a tu biblioteca exitosamente");
+            } else {
+                actions.setMessage("No se pudo agregar el libro a tu biblioteca");
+            }
+            
+        } catch (error) {
+            actions.setMessage("Error: " + error.message);
+        }
+    };
 
     // Cargar libros cuando el componente se monta
     useEffect(() => {
@@ -170,6 +209,7 @@ export const Welcome = () => {
                                     <BookCard 
                                         book={book} 
                                         onViewDetails={() => handleBookClick(book)}
+                                        onAddToLibrary={(e) => addToPersonalLibrary(book, e)}
                                     />
                                 </div>
                             ))}
@@ -284,6 +324,9 @@ export const Welcome = () => {
 
             {/* Overlay oscuro para el modal */}
             {showDetailModal && <div className="modal-backdrop fade show"></div>}
+
+            {/* Componente de mensaje */}
+            <MessageAlert />
         </div>
     );
 };
