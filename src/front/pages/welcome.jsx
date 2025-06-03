@@ -40,9 +40,12 @@ export const Welcome = () => {
         e.stopPropagation();
         
         try {
-            // Verificar si ya existe en libros personales
-            const existingBook = store.personalBooks.find(
-                pb => pb.explore_book_id === book.id
+            // Normalizar para comparación insensible a mayúsculas/minúsculas
+            const normalize = str => str ? str.toLowerCase().trim() : '';
+            
+            const existingBook = store.personalBooks.find(pb => 
+                normalize(pb.title) === normalize(book.title) && 
+                normalize(pb.author_name) === normalize(book.author)
             );
             
             if (existingBook) {

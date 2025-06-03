@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from api.utils import generate_sitemap, APIException
 from api.models import db, User, ExploreBook, PersonalBook, Favorite, Review
 from flask import Flask, request, jsonify, url_for, Blueprint
+from sqlalchemy import and_
 
 api = Blueprint('api', __name__)
 
@@ -246,8 +247,23 @@ def create_personal_book():
         required_fields = ['title', 'author_name']
         if not all(field in data for field in required_fields):
             return jsonify({"message": f"Missing required fields: {required_fields}"}), 400
+            
 
         current_user_id = get_jwt_identity()
+
+        # Verificar si el libro ya existe para este usuario
+        existing_book = PersonalBook.query.filter(
+            and_(
+                PersonalBook.title.ilike(f"%{data['title']}%"),
+                PersonalBook.author_name.ilike(f"%{data['author_name']}%"),
+                PersonalBook.created_by == current_user_id
+            )
+        ).first()
+        
+        if existing_book:
+            return jsonify({
+                "message": "Ya tienes este libro en tu biblioteca personal"
+            }), 400
 
         # Create new personal book
         new_book = PersonalBook(
