@@ -464,6 +464,12 @@ def update_user(user_id):
             return jsonify({"message": "User not found"}), 404
 
         data = request.get_json()
+        print(data)
+        
+        # Permitir actualizar el rol solo si no hay administradores
+        if 'rol' in data:
+            user.rol = data['rol']
+
         if 'email' in data:
             user.email = data['email'].lower()
         if 'password' in data:
@@ -638,7 +644,6 @@ def delete_review(review_id):
 
 #  --------------------------------------------- FAVORITES ---------------------------------------------------------------------
 
-
 @api.route('/favorites/<int:favorite_id>', methods=['GET'])
 @jwt_required()
 def get_single_favorite(favorite_id):
@@ -655,7 +660,6 @@ def get_single_favorite(favorite_id):
 
     except Exception as e:
         return jsonify({"message": f"Error: {str(e)}"}), 500
-
 
 @api.route('/favorites', methods=['GET'])
 @jwt_required()
@@ -691,7 +695,6 @@ def get_favorites():
             "success": False,
             "message": f"Error retrieving favorites: {str(e)}"
         }), 500
-
 
 @api.route('/favorites/explore', methods=['POST'])
 @jwt_required()
@@ -741,7 +744,6 @@ def add_explore_favorite():
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
 
-
 @api.route('/favorites/personal', methods=['POST'])
 @jwt_required()
 def add_personal_favorite():
@@ -789,7 +791,6 @@ def add_personal_favorite():
     except Exception as e:
         db.session.rollback()
         return jsonify({"message": f"Error: {str(e)}"}), 500
-
 
 @api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
 @jwt_required()
