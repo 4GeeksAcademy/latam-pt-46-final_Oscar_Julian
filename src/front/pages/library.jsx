@@ -735,14 +735,13 @@ export const Library = () => {
                                 </h5>
                                 <button
                                     type="button"
-                                    className="btn btn-sm btn-outline-light rounded-circle"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
                                     onClick={() => setShowDetailModal(false)}
-                                    style={{ width: "32px", height: "32px" }}
-                                >
-                                    <span style={{ fontSize: "1.2rem" }}>&times;</span>
-                                </button>
+                                    aria-label="Close"
+                                ></button>
                             </div>
-                            <div className="modal-body">
+                            <div className="modal-body bg-dark">
                                 {detailLoading ? (
                                     <div className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
@@ -773,10 +772,6 @@ export const Library = () => {
                                                 <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-list text-primary me-2"></i>
                                                     <strong className="text-dark">Categoría:</strong> {bookDetails.category || 'No especificada'}
-                                                </div>
-                                                <div className="detail-item text-dark">
-                                                    <i className="fa-solid fa-calendar-day text-primary me-2"></i>
-                                                    <strong>Agregado el:</strong> {new Date(bookDetails.created_at).toLocaleDateString()}
                                                 </div>
                                                 <div className="mt-4">
                                                     <h5 className="text-primary">

@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useGlobalReducer } from "../store/globalReducer";
 
-export const BookCard = ({ book, onViewDetails, onAddToLibrary }) => {
+export const BookCard = ({ book, onViewDetails }) => {
     const { store, actions } = useGlobalReducer();
     const [isProcessing, setIsProcessing] = useState(false);
-    const [isAddingToLibrary, setIsAddingToLibrary] = useState(false);
 
-    // Verificar si el libro está en favoritos
+    // Verificar si el libro está en favoritos usando el helper del store
     const isFavorite = actions.isFavorite(book.id, 'explore');
 
     const handleToggleFavorite = async (e) => {
@@ -42,19 +41,9 @@ export const BookCard = ({ book, onViewDetails, onAddToLibrary }) => {
         }
     };
 
-    const handleAddToLibrary = async (e) => {
-        e.stopPropagation();
-        setIsAddingToLibrary(true);
-        try {
-            await onAddToLibrary(e);
-        } finally {
-            setIsAddingToLibrary(false);
-        }
-    };
-
     return (
-        <div className="book-card position-relative">
-            {/* Botón de favorito */}
+        <div className="book-card position-relative" style={{ cursor: "pointer" }}>
+            {/* Botón de favorito que siempre aparece */}
             <button
                 className="btn btn-icon position-absolute m-1 m-md-2"
                 onClick={handleToggleFavorite}
@@ -65,19 +54,6 @@ export const BookCard = ({ book, onViewDetails, onAddToLibrary }) => {
                 <i className={`fa${isFavorite ? 's' : 'r'} fa-heart ${isProcessing ? 'fa-spinner fa-spin' :
                     isFavorite ? 'text-danger' : 'text-white-50'
                     }`}></i>
-            </button>
-
-            {/* Botón para agregar a la biblioteca personal */}
-            <button
-                className="btn btn-icon position-absolute m-1 m-md-2"
-                onClick={handleAddToLibrary}
-                disabled={isAddingToLibrary}
-                title="Agregar a mi biblioteca"
-                style={{ top: '4px', right: '4px', zIndex: 2 }}
-            >
-                <i className={`fa-solid fa-plus ${
-                    isAddingToLibrary ? 'fa-spinner fa-spin' : 'text-light'
-                }`}></i>
             </button>
 
             {/* Contenido de la tarjeta */}

@@ -1358,6 +1358,39 @@ a:hover {
   padding: 0.5rem;
 }
 
+/* Botón de cerrar modal responsivo */
+.modal-header .btn-close {
+  font-size: 1rem;
+  width: 1em;
+  height: 1em;
+  background-size: 0.75em;
+}
+
+@media (min-width: 576px) {
+  .modal-header .btn-close {
+    font-size: 1.2rem;
+    background-size: 0.85em;
+  }
+}
+
+@media (min-width: 768px) {
+  .modal-header .btn-close {
+    font-size: 1.25rem;
+    background-size: 1em;
+  }
+}
+
+/* Mejorar el espaciado en móviles */
+@media (max-width: 575.98px) {
+  .modal-header {
+    padding: 0.75rem;
+  }
+
+  .modal-header .btn-close {
+    margin: -0.375rem -0.375rem -0.375rem auto;
+  }
+}
+
 @media (min-width: 768px) {
   .btn-close {
     font-size: 1.2rem;

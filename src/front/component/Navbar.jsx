@@ -1,41 +1,12 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
 import { useGlobalReducer } from "../store/globalReducer";
 import { UserAdminModal } from "./UserAdminModal";
 import { SearchBar } from "./SearchBar";
-import { AssignAdminModal } from "./AssignAdminModal";
 
 export const Navbar = () => {
 	const { store, actions } = useGlobalReducer();
 	const navigate = useNavigate();
 	const location = useLocation();
-	const [hasAdmin, setHasAdmin] = useState(true);
-
-	// Verificar si hay administradores
-    useEffect(() => {
-        const checkAdmin = async () => {
-            if (!store.isAuthenticated) return;
-            try {
-                const response = await fetch(`${store.apiUrl}/api/users`, {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
-                    },
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-					
-					// Verificar si hay algún usuario con rol=1
-					const adminExists = data.some(user => user.rol === 1);
-					setHasAdmin(adminExists);
-                }
-            } catch (error) {
-                console.error("Error al verificar administradores:", error);
-            }
-        };
-        
-        checkAdmin();
-    }, [store.isAuthenticated, store.user]);
 
 	const handleLogout = () => {
 		actions.logout();
@@ -70,21 +41,6 @@ export const Navbar = () => {
 
 				{/* Barra de búsqueda (solo visible en rutas específicas cuando está autenticado) */}
 				{shouldShowSearchBar && <SearchBar />}
-
-				{/* Botón para asignar administrador si no hay ninguno */}
-                {store.isAuthenticated && !hasAdmin && (
-					<>
-						<button
-							className="btn btn-outline-warning ms-2"
-							data-bs-toggle="modal"
-							data-bs-target="#assignAdminModal"
-						>
-							<i className="fa-solid fa-crown me-1"></i>
-							<span className="text-span">Asignar Admin</span>
-						</button>
-						<AssignAdminModal /> {/* <-- Aquí se renderiza el modal */}
-					</>
-				)}
 
 				{store.user?.rol === 1 && (
 					<>
@@ -150,6 +106,10 @@ export const Navbar = () => {
 							<Link to="/privacy" className="btn btn-outline-light privacy-btn">
 								<i className="fa-solid fa-shield-alt me-1"></i>
 								<span className="text-span">Privacidad</span>
+							</Link>
+							<Link to="/desarrolladores" className="btn btn-outline-light privacy-btn">
+								<i class="fa-solid fa-code me-1"></i>
+								<span className="text-span">Desarrolladores</span>
 							</Link>
 						</>
 					) : (

@@ -227,11 +227,11 @@ export const Favorites = () => {
                                 </h5>
                                 <button
                                     type="button"
-                                    className="btn btn-sm btn-outline-light rounded-circle"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
                                     onClick={() => setShowDetailModal(false)}
-                                    style={{ width: "32px", height: "32px" }}
+                                    aria-label="Close"
                                 >
-                                    <span style={{ fontSize: "1.2rem" }}>&times;</span>
                                 </button>
                             </div>
                             <div className="modal-body">
@@ -342,16 +342,21 @@ const FavoriteCard = ({ favorite, onViewDetails, onRemoveFavorite }) => {
                 {/* Botón para eliminar de favoritos */}
                 <div className="position-absolute top-0 start-0 m-2" style={{ zIndex: 2 }}>
                     <button
-                        className="btn btn-sm btn-danger rounded-circle"
+                        className="btn btn-sm btn-danger rounded-circle d-flex align-items-center justify-content-center"
                         onClick={handleRemove}
                         disabled={isRemoving}
                         title="Eliminar de favoritos"
-                        style={{ width: "32px", height: "32px" }}
+                        style={{
+                            width: "32px",
+                            height: "32px",
+                            padding: "0",
+                            border: "none"
+                        }}
                     >
                         {isRemoving ? (
-                            <i className="fa fa-spinner fa-spin"></i>
+                            <i className="fa fa-spinner fa-spin" style={{ fontSize: "0.875rem" }}></i>
                         ) : (
-                            <i className="fa-solid fa-heart-crack"></i>
+                            <i className="fa-solid fa-heart-crack" style={{ fontSize: "0.875rem" }}></i>
                         )}
                     </button>
                 </div>

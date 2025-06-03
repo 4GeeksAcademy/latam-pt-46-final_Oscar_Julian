@@ -42,7 +42,7 @@ export const PersonalBookCard = ({ book, onEdit, onDelete, onViewReviews, onView
                 <div className="position-absolute top-0 start-0 m-2"
                     style={{ zIndex: 1 }}>
                     <button
-                        className="btn btn-icon position-absolute m-1 m-md-2" 
+                        className="btn btn-icon position-absolute m-1 m-md-2"
                         onClick={handleToggleFavorite}
                         disabled={isProcessing}
                         title={isFavorite ? "Eliminar de favoritos" : "Agregar a favoritos"}

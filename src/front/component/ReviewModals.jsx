@@ -11,8 +11,8 @@ export const CreateReviewModal = ({
 
     return (
         <div className="modal show d-block" tabIndex="-1">
-            <div className="modal-dialog">
-                <div className="modal-content">
+            <div className="modal-dialog bg-dark">
+                <div className="modal-content bg-dark">
                     <div className="modal-header bg-success text-white">
                         <h5 className="modal-title">
                             <i className="fa-solid fa-star me-2"></i>

@@ -13,6 +13,7 @@ import { About } from "./pages/About";
 import { Features } from "./pages/Features";
 import { Help } from "./pages/Help";
 import { Privacy } from "./pages/Privacy";
+import { Desarrolladores } from "./pages/Desarrolladores";
 import { Stats } from "./pages/Stats";
 import { NotFound } from "./pages/notFound";
 import { Navbar } from "./component/Navbar";
@@ -50,6 +51,7 @@ const App = () => {
                             <Route path="/help" element={<Help />} />
                             <Route path="/terms" element={<Terms />} />
                             <Route path="/privacy" element={<Privacy />} />
+                            <Route path="/desarrolladores" element={<Desarrolladores />} />
 
                             {/* Rutas protegidas */}
                             <Route path="/welcome" element={

@@ -4,76 +4,34 @@ import { useGlobalReducer } from "../store/globalReducer";
 import { BookCard } from "../component/BookCard";
 import { Pagination } from "../component/Pagination";
 import { FilterBar } from "../component/FilterBar";
-import { MessageAlert } from "../component/MessageAlert";
 
 export const Welcome = () => {
     const { store, actions } = useGlobalReducer();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
-    
+
     // Estados para el modal de detalles
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [selectedBook, setSelectedBook] = useState(null);
     const [bookDetails, setBookDetails] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
 
-    // Verificar autenticación y cargar datos
+    // Verificar autenticación cuando el componente carga, Cargar Favoritos
     useEffect(() => {
         const checkAuth = async () => {
             await actions.validateToken();
             setLoading(false);
         };
 
-        const loadData = async () => {
+        const loadFavorites = async () => {
             if (store.user) {
                 await actions.getFavorites();
-                await actions.getPersonalBooks();
             }
         };
-        
-        loadData();
+
+        loadFavorites();
         checkAuth();
     }, []);
-
-    // Función para agregar un libro a la biblioteca personal
-    const addToPersonalLibrary = async (book, e) => {
-        e.stopPropagation();
-        
-        try {
-            // Normalizar para comparación insensible a mayúsculas/minúsculas
-            const normalize = str => str ? str.toLowerCase().trim() : '';
-            
-            const existingBook = store.personalBooks.find(pb => 
-                normalize(pb.title) === normalize(book.title) && 
-                normalize(pb.author_name) === normalize(book.author)
-            );
-            
-            if (existingBook) {
-                actions.setMessage("Este libro ya está en tu biblioteca");
-                return;
-            }
-            
-            // Crear el libro personal
-            const bookData = {
-                title: book.title,
-                author_name: book.author,
-                genre: book.genre,
-                category: book.category,
-                cover_image: book.coverImage,
-                explore_book_id: book.id
-            };
-            
-            const success = await actions.createPersonalBook(bookData);
-            if (success) {
-                actions.setMessage("Libro agregado a tu biblioteca exitosamente");
-            } else {
-                actions.setMessage("No se pudo agregar el libro a tu biblioteca");
-            }
-            
-        } catch (error) {
-            actions.setMessage("Error: " + error.message);
-        }
-    };
 
     // Cargar libros cuando el componente se monta
     useEffect(() => {
@@ -100,13 +58,16 @@ export const Welcome = () => {
     const fetchBookDetails = async (bookId) => {
         setDetailLoading(true);
         try {
-            const response = await fetch(`${store.apiUrl}/api/explore-books/${bookId}`, {
-                headers: {
-                    "Authorization": `Bearer ${sessionStorage.getItem("token")}`
+            const response = await fetch(
+                `${store.apiUrl}/api/explore-books/${bookId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+                    },
                 }
-            });
+            );
 
-            if (!response.ok) throw new Error('Error al obtener detalles');
+            if (!response.ok) throw new Error("Error al obtener detalles");
             const data = await response.json();
             setBookDetails(data);
         } catch (error) {
@@ -127,7 +88,7 @@ export const Welcome = () => {
     const getFilteredBooks = () => {
         if (!store.books || store.books.length === 0) return [];
 
-        return store.books.filter(book => {
+        return store.books.filter((book) => {
             // Aplicar filtro de autor si existe
             if (store.filters.author && book.author !== store.filters.author) {
                 return false;
@@ -209,10 +170,9 @@ export const Welcome = () => {
                                     className="book-appear"
                                     style={{ animationDelay: `${index * 0.05}s` }}
                                 >
-                                    <BookCard 
-                                        book={book} 
+                                    <BookCard
+                                        book={book}
                                         onViewDetails={() => handleBookClick(book)}
-                                        onAddToLibrary={(e) => addToPersonalLibrary(book, e)}
                                     />
                                 </div>
                             ))}
@@ -226,8 +186,9 @@ export const Welcome = () => {
                         <i className="fa-solid fa-face-frown"></i>
                         <h3>No se encontraron libros</h3>
                         <p>
-                            No hay libros que coincidan con tus criterios de búsqueda o filtros.
-                            Intenta ajustar tus filtros o realizar una búsqueda diferente.
+                            No hay libros que coincidan con tus criterios de búsqueda o
+                            filtros. Intenta ajustar tus filtros o realizar una búsqueda
+                            diferente.
                         </p>
                         <button
                             className="btn btn-outline-light mt-3"
@@ -252,14 +213,13 @@ export const Welcome = () => {
                                 </h5>
                                 <button
                                     type="button"
-                                    className="btn btn-sm btn-outline-light rounded-circle"
+                                    className="btn-close"
+                                    data-bs-dismiss="modal"
                                     onClick={() => setShowDetailModal(false)}
-                                    style={{ width: "32px", height: "32px" }}
-                                >
-                                    <span style={{ fontSize: "1.2rem" }}>&times;</span>
-                                </button>
+                                    aria-label="Close"
+                                ></button>
                             </div>
-                            <div className="modal-body">
+                            <div className="modal-body bg-dark">
                                 {detailLoading ? (
                                     <div className="text-center py-4">
                                         <div className="spinner-border text-primary" role="status">
@@ -270,10 +230,12 @@ export const Welcome = () => {
                                     <div className="row">
                                         <div className="col-md-4 text-center">
                                             <img
-                                                src={bookDetails.cover_image || '/default-book-cover.jpg'}
+                                                src={
+                                                    bookDetails.cover_image || "/default-book-cover.jpg"
+                                                }
                                                 alt={`Portada de ${bookDetails.title}`}
                                                 className="img-fluid rounded shadow mb-3"
-                                                style={{ maxHeight: '300px' }}
+                                                style={{ maxHeight: "300px" }}
                                             />
                                         </div>
                                         <div className="col-md-8">
@@ -281,15 +243,18 @@ export const Welcome = () => {
                                             <div className="details-section">
                                                 <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-user-pen text-primary me-2"></i>
-                                                    <strong className="text-dark">Autor:</strong> {bookDetails.author_name}
+                                                    <strong className="text-dark">Autor:</strong>{" "}
+                                                    {bookDetails.author_name}
                                                 </div>
                                                 <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-tag text-primary me-2"></i>
-                                                    <strong className="text-dark">Género:</strong> {bookDetails.genre || 'No especificado'}
+                                                    <strong className="text-dark">Género:</strong>{" "}
+                                                    {bookDetails.genre || "No especificado"}
                                                 </div>
                                                 <div className="detail-item text-dark">
                                                     <i className="fa-solid fa-list text-primary me-2"></i>
-                                                    <strong className="text-dark">Categoría:</strong> {bookDetails.category || 'No especificada'}
+                                                    <strong className="text-dark">Categoría:</strong>{" "}
+                                                    {bookDetails.category || "No especificada"}
                                                 </div>
                                                 <div className="mt-4">
                                                     <h5 className="text-primary">
@@ -297,7 +262,8 @@ export const Welcome = () => {
                                                         Resumen
                                                     </h5>
                                                     <p className="text-dark">
-                                                        {bookDetails.summary || 'Este libro no tiene resumen.'}
+                                                        {bookDetails.summary ||
+                                                            "Este libro no tiene resumen."}
                                                     </p>
                                                 </div>
                                             </div>
@@ -327,9 +293,6 @@ export const Welcome = () => {
 
             {/* Overlay oscuro para el modal */}
             {showDetailModal && <div className="modal-backdrop fade show"></div>}
-
-            {/* Componente de mensaje */}
-            <MessageAlert />
         </div>
     );
 };
