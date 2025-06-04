@@ -32,25 +32,99 @@ export const Desarrolladores = () => {
         },
         {
             id: 2,
-            nombre: "Carlos Rodríguez",
-            pais: "Argentina",
+            nombre: "Julian Ortega",
+            pais: "Colombia",
             edad: 29,
             foto: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
             habilidades: [
                 "JavaScript",
                 "TypeScript",
                 "Vue.js",
+                "React.js",
+                "Angular",
+                "PHP",
+                "Python",
+                "CSS",
+                "SCSS",
+                "Styled components",
+                "Laravel",
                 "Express.js",
-                "MongoDB",
-                "Firebase"
+                "MYSQL",
+                "Firebase",
+                "JWT",
+                "OAuth2",
+                "Jest",
+                "Plataformas embebidas (Arduino, PLCs)",
+                "Inglés (C1)",
+                "IA Generativa"
             ],
             metas: [
+                "Ser Desarrollador Senior FullStack",
                 "Especializarme en arquitectura de software",
                 "Crear mi propia startup tecnológica",
                 "Mentorear a nuevos desarrolladores",
-                "Obtener certificaciones en Cloud Computing"
+                "Obtener certificaciones en Cloud Computing",
+                "Desarrollar soluciones tecnológicas para energías renovables",
+                "Aportar al desarrollo regional desde la tecnología"
             ],
-            resumenPersonal: "Programador autodidacta con gran pasión por la tecnología y la innovación. Me fascina resolver problemas complejos y crear aplicaciones escalables. Cuando no estoy programando, me gusta tocar guitarra y practicar deportes al aire libre."
+            resumenPersonal: "Soy ingeniero electrónico bilingüe apasionado por el desarrollo web y las energías renovables. Con experiencia tanto en frontend como backend, he trabajado en proyectos tecnológicos diversos que abarcan desde aplicaciones web hasta instalaciones fotovoltaicas. Me motiva resolver problemas reales mediante soluciones innovadoras y sostenibles, y busco seguir creciendo como profesional integral en tecnología.",
+            formacion: [
+                "Ingeniero Electrónico - Universidad Autónoma del Cauca (2020)",
+                "Instalador Sistemas SFV - Escuela Casa Solar (2020)",
+                "Dominio del idioma Inglés - Universidad del Cauca (2015)"
+            ],
+            experiencia: [
+                {
+                    empresa: "GRANDTEK – SOFTWARE",
+                    año: "2023 - 2024",
+                    cargo: "Desarrollador Web",
+                    tareas: [
+                        "Captura y análisis de requerimientos",
+                        "Diseño e implementación de software",
+                        "Pruebas, soporte técnico y gestión de cambios"
+                    ]
+                },
+                {
+                    empresa: "TELEPERFORMANCE – CALL CENTER",
+                    año: "2022 - 2023",
+                    cargo: "Agente bilingüe - Uber",
+                    tareas: [
+                        "Atención al cliente, resolución de problemas",
+                        "Manejo de quejas y seguimiento a solicitudes"
+                    ]
+                },
+                {
+                    empresa: "PIL PERU",
+                    año: "2021 - 2022",
+                    cargo: "Analista Externo",
+                    tareas: [
+                        "Cotización de sistemas eléctricos y de control"
+                    ]
+                },
+                {
+                    empresa: "ECOLOMBIA SOLAR",
+                    año: "2020",
+                    cargo: "Técnico en SSFV",
+                    tareas: [
+                        "Instalación y mantenimiento de sistemas solares hasta 22 kW"
+                    ]
+                },
+                {
+                    empresa: "VENTAS HAMILTON ORTEGA - INMOBILIARIA",
+                    año: "2019",
+                    cargo: "Asesor comercial",
+                    tareas: [
+                        "Asesoría en compra de proyectos inmobiliarios",
+                        "Gestión de registros y administración"
+                    ]
+                }
+            ],
+            contacto: {
+                github: "https://github.com/Juliandos",
+                email: "95juliandos@gmail.com",
+                telefono: "+57 3117857025",
+                ubicacion: "Popayán, Colombia"
+            }
         }
     ];
 
