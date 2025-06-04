@@ -116,10 +116,9 @@ export const Home = () => {
                   <div className="feature-icon mb-3">
                     <i className="fas fa-bookmark fa-3x text-success"></i>
                   </div>
-                  <h3 className="text-white mb-3">Seguimiento de lecturas</h3>
+                  <h3 className="text-white mb-3">Manejo de Favoritos</h3>
                   <p className="text-white-50">
-                    Marca tus libros como leídos, en progreso o pendientes, y
-                    registra tus avances.
+                    Marca tus libros como favoritos y organizalos
                   </p>
                 </div>
               </div>
@@ -180,8 +179,7 @@ export const Home = () => {
                   <div className="step-content">
                     <h3 className="text-white">Añade tus libros</h3>
                     <p className="text-white-50">
-                      Agrega manualmente tus libros o utiliza el escáner de ISBN
-                      para importarlos rápidamente.
+                      Agrega manualmente tus libros
                     </p>
                   </div>
                 </div>
@@ -193,7 +191,7 @@ export const Home = () => {
                     <h3 className="text-white">Organiza tu colección</h3>
                     <p className="text-white-50">
                       Crea estanterías virtuales y organiza tus libros por
-                      categorías, etiquetas o estados de lectura.
+                      categorías, genero y mas.
                     </p>
                   </div>
                 </div>
