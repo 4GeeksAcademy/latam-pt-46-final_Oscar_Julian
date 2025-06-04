@@ -42,42 +42,8 @@ export const Navbar = () => {
 				{/* Barra de búsqueda (solo visible en rutas específicas cuando está autenticado) */}
 				{shouldShowSearchBar && <SearchBar />}
 
-				{store.user?.rol === 1 && (
-					<>
-						<button
-							className="btn btn-outline-info ms-2"
-							data-bs-toggle="modal"
-							data-bs-target="#userAdminModal"
-						>
-							<i className="fa-solid fa-users-gear me-1"></i>
-							<span className="text-span">Administrar Usuarios</span>
-						</button>
-						<UserAdminModal />
-					</>
-				)}
-
 				{/* Botón de sembrar base de datos (solo cuando está autenticado) */}
-				{/* {store.isAuthenticated && (
-					<div className="btn-group shadow-0 w-auto" role="group" aria-label="Database Actions">
-						<button
-							className="btn btn-warning"
-							onClick={handleSeedDatabase}
-							disabled={store.isSeeding}
-						>
-							{store.isSeeding ? (
-								<>
-									<span className="spinner-border spinner-border-sm" role="status"></span>
-									<span className="ms-2">Sembrando... {store.seedingProgress}%</span>
-								</>
-							) : (
-								<>
-									<i className="fa-solid fa-database me-2"></i>
-									<span className="text-span">Poblar Base de Datos</span>
-								</>
-							)}
-						</button>
-					</div>
-				)} */}
+
 
 				{/* Navegación principal */}
 				<div className="btn-group shadow-0 w-auto" role="group" aria-label="Main Navigation">
@@ -114,6 +80,40 @@ export const Navbar = () => {
 						</>
 					) : (
 						<>
+							{store.user?.rol === 1 && (
+								<>
+									<button
+										className="btn btn-outline-info ms-2"
+										data-bs-toggle="modal"
+										data-bs-target="#userAdminModal"
+									>
+										<i className="fa-solid fa-users-gear me-1"></i>
+										<span className="text-span">Administrar Usuarios</span>
+									</button>
+									<UserAdminModal />
+								</>
+							)}
+							{(store.isAuthenticated && store.user?.rol === 1) && (
+								<div className="btn-group shadow-0 w-auto" role="group" aria-label="Database Actions">
+									<button
+										className="btn btn-warning"
+										onClick={handleSeedDatabase}
+										disabled={store.isSeeding}
+									>
+										{store.isSeeding ? (
+											<>
+												<span className="spinner-border spinner-border-sm" role="status"></span>
+												<span className="ms-2">Sembrando... {store.seedingProgress}%</span>
+											</>
+										) : (
+											<>
+												<i className="fa-solid fa-database me-2"></i>
+												<span className="text-span">Poblar Base de Datos</span>
+											</>
+										)}
+									</button>
+								</div>
+							)}
 							<Link className="btn btn-outline-light home-btn" to="/favorites">
 								<i className="fa-solid fa-heart me-1 text-danger"></i>
 								<span className="text-span">Favoritos</span>
